@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Creating New Event Type</title>
+  <style>
+    .main{
+      padding:20px;
+    }
+    header{
+      width:300px;
+    }
+    .event-form{
+      display:flex;
+      flex-direction:column;
+      align-items:left;
+      justify-content:left;
+      width:300px;
+    }
+    .form-label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+    .location-options {
+      margin-bottom: 10px;
+    }
+
+    .location-option {
+      margin-bottom: 5px;
+    }
+    .location-label {
+      margin-left: 5px;
+    }
+    .submit-button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+
+  </style>
+</head>
+<body>
+<div class="main">
+  <header>
+    <a th:href="@{/event_types}" class="cancel-link">cancel</a>
+    <h3 class="title">New Event Type</h3>
+    <hr>
+  </header>
+  <form  th:action="@{/}" th:object="${event}" class="event-form">
+    <label for="event_name" class="form-label">Event name *:</label>
+    <input id="event_name" type="text" th:field="*{title}" class="form-input" required>
+    <label for="time-duration" class="form-label">Duration *:</label>
+    <select id="time-duration" th:field="${event.duration}" class="form-select" required>
+      <option value="15">15 minutes</option>
+      <option value="30" selected>30 minutes</option>
+      <option value="45">45 minutes</option>
+      <option value="60">1 hour</option>
+      <option value="90">1 hour 30 minutes</option>
+      <option value="120">2 hours</option>
+    </select>
+    <label class="form-label">Location:</label>
+    <div class="location-options">
+      <div class="location-option">
+        <input type="radio" id="location-1" th:field="*{platform}" th:value="zoom" class="location-radio" required>
+        <label for="location-1" class="location-label">Zoom</label>
+      </div>
+      <div class="location-option">
+        <input type="radio" id="location-2" th:field="*{platform}" th:value="phone-call" class="location-radio" required>
+        <label for="location-2" class="location-label">Phone call</label>
+      </div>
+      <div class="location-option">
+        <input type="radio" id="location-3" th:field="*{platform}" th:value="in-person" class="location-radio" required>
+        <label for="location-3" class="location-label">Google meeting</label>
+      </div>
+    </div>
+
+    <input type="submit" value="Continue" class="submit-button">
+  </form>
+</div>
+</body>
+
+</html>

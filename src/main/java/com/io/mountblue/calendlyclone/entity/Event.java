@@ -1,19 +1,19 @@
 package com.io.mountblue.calendlyclone.entity;
 
 import jakarta.persistence.*;
+import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.List;
 
 @Entity
 @Table(name="events")
 public class Event {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
-    @Column(name = "title")
+    @Column(name = "title", nullable=false)
     private String title;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
@@ -23,12 +23,11 @@ public class Event {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "duration")
+    @Column(name = "duration", nullable = false)
     private int duration;
 
-    @Column(name = "platform")
+    @Column(name = "platform", nullable = false)
     private String platform;
-
 
     @Column(name = "date_range")
     private int dateRange;
