@@ -4,6 +4,7 @@ import com.io.mountblue.calendlyclone.Repository.UserRepository;
 import com.io.mountblue.calendlyclone.entity.User;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,7 +21,15 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void save(User user)
     {
-        userRepository.save(user);
+        User existingUser = findUserByEmail(user.getEmail());
+        if(existingUser == null) {
+            String password = user.getPassword();
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            String encodedPassword = passwordEncoder.encode(password);
+            user.setPassword(encodedPassword);
+
+            userRepository.save(user);
+        }
     }
 
 
