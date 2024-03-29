@@ -1,4 +1,4 @@
-package com.io.mountblue.calendlyclone.security;
+package com.io.mountblue.calendlyclone.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

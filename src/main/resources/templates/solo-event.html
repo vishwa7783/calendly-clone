@@ -43,7 +43,21 @@
       border-radius: 4px;
       cursor: pointer;
     }
-
+    .calendar {
+        border-collapse: collapse;
+    }
+    .calendar th, .calendar td {
+        border: 1px solid black;
+        padding: 10px;
+        text-align: center;
+    }
+    .date{
+        text-decoration:none;
+        color:black;
+    }
+    .date:hover{
+        color:blue;
+    }
 
   </style>
 </head>
@@ -81,7 +95,6 @@
         <label for="location-3" class="location-label">Google meeting</label>
       </div>
     </div>
-
     <input type="submit" value="Continue" class="submit-button">
   </form>
 </div>
