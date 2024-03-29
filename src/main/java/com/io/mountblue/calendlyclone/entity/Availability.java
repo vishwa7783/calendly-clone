@@ -37,8 +37,7 @@ public class Availability {
     public Availability() {
     }
 
-    public Availability(Date date, LocalTime startTime, LocalTime endTime, String day) {
-        this.date = date;
+    public Availability(  String day,LocalTime startTime, LocalTime endTime) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.day = day;
