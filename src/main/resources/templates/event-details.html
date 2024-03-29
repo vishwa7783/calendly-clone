@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Details</title>
+</head>
+<body>
+<form th:object="${emailDto}" method="post" th:action="@{/submitEmail}" >
+    <label>From:</label>
+    <input type="text" th:field="*{from}" required/><br/>
+
+    <label>To:</label>
+    <input type="text" th:field="*{to}" required/><br/>
+
+    <label>To (List):</label>
+    <input type="text" th:field="*{toList}" /><br/>
+
+    <label>Message:</label>
+    <textarea th:field="*{message}" required></textarea><br/>
+
+    <label>Subject:</label>
+    <input type="text" th:field="*{subject}" required/><br/>
+
+    <button type="submit">Submit</button>
+</form>
+
+</body>
+</html>

@@ -44,6 +44,7 @@
       cursor: pointer;
       border:2px solid black;
     }
+
     .availability-option{
        display:grid;
        grid-template-columns:120px 120px;
@@ -52,6 +53,21 @@
     .availability-label{
        padding-top:10px;
 
+    .calendar {
+        border-collapse: collapse;
+    }
+    .calendar th, .calendar td {
+        border: 1px solid black;
+        padding: 10px;
+        text-align: center;
+    }
+    .date{
+        text-decoration:none;
+        color:black;
+    }
+    .date:hover{
+        color:blue;
+>>>>>>> event-controller
     }
 
   </style>
@@ -97,6 +113,7 @@
     <label class="form-label">Availability:</label>
     <div class="availability-options">
       <div class="availability-option" th:each="availability, dayIndex : ${event.availableHoursByDays}">
+        <input type="hidden" th:field="*{availableHoursByDays[__${dayIndex.index}__].day}" th:value="${availability.day}" />
         <label th:text="${availability.day}" class="availability-label"></label><br>
         <select th:id="'start-time-' + ${dayIndex}" th:field="*{availableHoursByDays[__${dayIndex.index}__].startTime}" class="availability-start-time">
           <option value="09:00">9:00 AM</option>

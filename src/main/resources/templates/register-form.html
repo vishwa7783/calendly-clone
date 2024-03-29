@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Sign up Page</title>
+    <title>Register Form</title>
     <style>
         body{
             border:2px solid black;
@@ -14,25 +14,31 @@
             text-align:center;
             font-size:large;
         }
+        .already-exist{
+            color:red;
+            font-size:large;
+        }
     </style>
 </head>
 <body>
 <form class="signup" th:action="@{/saveUser}" th:object="${user}" method="post" >
     <h2> Register Below</h2>
     <p>
-        Username: <input type="text" name="name" th:field="*{name}">
+        Username: <input type="text" name="name" th:field="*{name}" required>
     </p>
     <p>
-        Email: <input type="email" name="email" th:field="*{email}">
+        Email: <input type="email" name="email" th:field="*{email}" required>
     </p>
     <p>
-        Password: <input type="password" name="password" th:field="*{password}">
+        Password: <input type="password" name="password" th:field="*{password}" required>
     </p>
     <input type="submit" value="Register">
 </form>
-<div th:if="${emailExists}">
-    <a th:href="@{/login}"><input type="submit" value="Email id already exists.Back to login"></a>
-</div>
-
+<p th:if="${emailExists}">
+    <a th:href="@{/login}" ><input class="already-exist" type="submit" value="Email id already exists.Back to login"></a>
+</p>
+<p th:if="${!emailExists}">Already a user.
+    <a th:href="@{/login}"><input type="submit" value="Back to login"></a>
+</p>
 </body>
 </html>

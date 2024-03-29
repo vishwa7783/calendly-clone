@@ -24,7 +24,6 @@ public class UserController {
 
     @GetMapping("/access-denied")
     public String showAccessDenied(){
-
         return "access-denied";
     }
 
@@ -32,6 +31,7 @@ public class UserController {
     public String showRegistrationForm(Model themodel){
         User user=new User();
         themodel.addAttribute("user",user);
+        themodel.addAttribute("emailExists", false);
         return "register-form";
     }
 
@@ -42,13 +42,7 @@ public class UserController {
             themodel.addAttribute("emailExists",true);
             return "register-form";
         }
-
-        String password="{noop}"+theuser.getPassword();
-        theuser.setPassword(password);
         userService.save(theuser);
         return "redirect:/login";
-
     }
-
-
 }
