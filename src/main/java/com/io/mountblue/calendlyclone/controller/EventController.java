@@ -3,7 +3,10 @@ package com.io.mountblue.calendlyclone.controller;
 import com.io.mountblue.calendlyclone.entity.Availability;
 import com.io.mountblue.calendlyclone.entity.Event;
 import com.io.mountblue.calendlyclone.entity.User;
+import com.io.mountblue.calendlyclone.service.AvailabilityService;
+import com.io.mountblue.calendlyclone.service.EventService;
 import com.io.mountblue.calendlyclone.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -12,17 +15,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 
 @Controller
 public class EventController {
+    EventService eventService;
     UserService userService;
+    AvailabilityService availabilityService;
 
-    public EventController(UserService userService) {
+    @Autowired
+    public EventController(EventService eventService, UserService userService, AvailabilityService availabilityService) {
+        this.eventService = eventService;
         this.userService = userService;
+        this.availabilityService = availabilityService;
     }
 
     @GetMapping("/event_types")
@@ -58,7 +64,6 @@ public class EventController {
         return "solo-event";
     }
 
-
     @GetMapping("event_types/group")
     public String eventTypeGroup(Model model){
         Event event = new Event();
@@ -66,19 +71,28 @@ public class EventController {
         return "group-event";
     }
 
-    @GetMapping("/")
-    public String fun(@AuthenticationPrincipal UserDetails userDetails, @ModelAttribute("event") Event event, Model model)
+    @GetMapping("/saveEvent")
+    public String createEvent(@AuthenticationPrincipal UserDetails userDetails, @ModelAttribute("event") Event event, Model model)
     {
+        String meetingId = UUID.randomUUID().toString();
         User host = userService.findUserByEmail(userDetails.getUsername());
-        event.setEventLink("https://calendly.com/"+host.getName()+event.getDuration());
-        model.addAttribute("event",event);
+        String eventLink = "https://calendly.com/"+host.getName()+"/"+event.getDuration()+"/"+meetingId;
+        event.setEventLink(eventLink);
         event.setHost(host);
 
-        for(Availability A:event.getAvailableHoursByDays()){
-            System.out.println(A.getDay());
-            System.out.println(A.getStartTime());
-            System.out.println(A.getEndTime());
+        for (Availability availability : event.getAvailableHoursByDays()) {
+            availability.setHost(host);
         }
-        return "event-type";
+
+        eventService.save(event);
+        Event theEvent = eventService.findByEventLink(eventLink);
+        for (Availability availability : theEvent.getAvailableHoursByDays()) {
+            availability.setEvent(theEvent);
+            availabilityService.save(availability);
+        }
+
+        model.addAttribute("event",theEvent);
+
+        return "check";
     }
 }

@@ -46,8 +46,6 @@ public class EmailController {
     @PostMapping("/sendCalendar")
     public String sendCalendar(@ModelAttribute CalenderDto calenderDto, @ModelAttribute("emails") String emails) throws MessagingException, IOException {
         List<Attendee> attendees = new ArrayList<>();
-        System.out.println(emails);
-        System.out.println("\n"+calenderDto.getAttendees());
         Attendee attendee = new Attendee("vishwa", "vishwjeet7783@gmail.com");
         attendees.add(attendee);
 

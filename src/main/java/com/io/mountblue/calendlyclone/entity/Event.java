@@ -3,6 +3,7 @@ package com.io.mountblue.calendlyclone.entity;
 import jakarta.persistence.*;
 import org.antlr.v4.runtime.misc.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -32,10 +33,10 @@ public class Event {
     @Column(name = "date_range")
     private int dateRange;
 
-    @Column(name = "event_link")
+    @Column(name = "event_link", unique = true)
     private  String eventLink;
 
-    @OneToMany(mappedBy = "event", cascade = {CascadeType.ALL})
+    @OneToMany(mappedBy = "event", cascade = {CascadeType.DETACH, CascadeType.REFRESH, CascadeType.MERGE, CascadeType.REMOVE})
     private List<Availability> availableHoursByDays;
 
     @OneToMany(mappedBy = "event", cascade = {CascadeType.ALL})
@@ -132,5 +133,19 @@ public class Event {
 
     public void setMeets(List<Meet> meets) {
         this.meets = meets;
+    }
+
+    public void addAvailability(Availability availability){
+        if(availableHoursByDays == null){
+            availableHoursByDays = new ArrayList<>();
+        }
+        availableHoursByDays.add(availability);
+    }
+
+    public void addMeet(Meet meet){
+        if(meets == null){
+            meets = new ArrayList<>();
+        }
+        meets.add(meet);
     }
 }
