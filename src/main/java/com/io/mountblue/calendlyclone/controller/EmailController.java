@@ -32,6 +32,7 @@ public class EmailController {
     public String sendEmail(@RequestParam("sender") String sender,
                             @RequestParam("recipients") String recipients,
                             @RequestParam("subject") String subject,Model model) {
+
         Event event=(Event)model.getAttribute("event");
         emailService.sendEmail(sender,recipients,subject,event);
 
