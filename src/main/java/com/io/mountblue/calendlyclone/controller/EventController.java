@@ -69,16 +69,19 @@ public class EventController {
     @GetMapping("/")
     public String fun(@AuthenticationPrincipal UserDetails userDetails, @ModelAttribute("event") Event event, Model model)
     {
-        User host = userService.findUserByEmail(userDetails.getUsername());
-        event.setEventLink("https://calendly.com/"+host.getName()+event.getDuration());
+        String email=userDetails.getUsername();
+        User host=userService.findUserByEmail(userDetails.getUsername());
+        int atIndex = email.indexOf('@');
+        String username = email.substring(0, atIndex);
+        event.setEventLink("https://calendly.com/"+username+"/"+event.getDuration()+"min");
         model.addAttribute("event",event);
         event.setHost(host);
-
         for(Availability A:event.getAvailableHoursByDays()){
             System.out.println(A.getDay());
             System.out.println(A.getStartTime());
             System.out.println(A.getEndTime());
         }
-        return "event-type";
+        model.addAttribute("event",event);
+        return "check";
     }
 }

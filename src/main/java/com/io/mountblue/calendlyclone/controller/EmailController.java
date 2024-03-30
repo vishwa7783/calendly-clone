@@ -1,5 +1,6 @@
 package com.io.mountblue.calendlyclone.controller;
 
+import com.io.mountblue.calendlyclone.entity.Event;
 import com.io.mountblue.calendlyclone.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -30,8 +31,9 @@ public class EmailController {
     @PostMapping("/sendEmail")
     public String sendEmail(@RequestParam("sender") String sender,
                             @RequestParam("recipients") String recipients,
-                            @RequestParam("subject") String subject) {
-        emailService.sendEmail(sender,recipients,subject);
+                            @RequestParam("subject") String subject,Model model) {
+        Event event=(Event)model.getAttribute("event");
+        emailService.sendEmail(sender,recipients,subject,event);
 
         return "redirect:/dashboard";
     }
@@ -44,16 +46,19 @@ public class EmailController {
     }
 
     @PostMapping("/sendCalendar")
-    public String sendCalendar(@ModelAttribute CalenderDto calenderDto, @ModelAttribute("emails") String emails) throws MessagingException, IOException {
+    public String sendCalendar(@ModelAttribute CalenderDto calenderDto, @ModelAttribute("emails") String emails,Model model) throws MessagingException, IOException {
         List<Attendee> attendees = new ArrayList<>();
         System.out.println(emails);
         System.out.println("\n"+calenderDto.getAttendees());
-        Attendee attendee = new Attendee("vishwa", "vishwjeet7783@gmail.com");
-        attendees.add(attendee);
-
+        Attendee attendee1 = new Attendee("vishwa", "vishwjeet7783@gmail.com");
+        Attendee attendee2 = new Attendee("Harsha", "harsha113@gmail.com");
+        attendees.add(attendee1);
+        attendees.add(attendee2);
+        Event event = (Event) model.getAttribute("event");
         calenderDto.setAttendees(attendees);
-        emailService.sendCalenderInvite(calenderDto);
+        emailService.sendCalenderInvite(calenderDto,event);
         return "redirect:/event_types";
     }
+
 }
 

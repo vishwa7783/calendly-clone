@@ -8,6 +8,8 @@ import biweekly.property.Method;
 import biweekly.util.Duration;
 import com.io.mountblue.calendlyclone.dto.CalenderDto;
 import com.io.mountblue.calendlyclone.dto.EmailDto;
+import com.io.mountblue.calendlyclone.entity.Availability;
+import com.io.mountblue.calendlyclone.entity.Event;
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
 import jakarta.mail.Address;
@@ -22,9 +24,11 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -40,8 +44,8 @@ public class EmailServiceImpl implements EmailService{
     private JavaMailSender javaMailSender;
 
     @Override
-    public void sendEmail(String sender,String recipients,String subject) {
-        String emailContent = getEmailContent();
+    public void sendEmail(String sender,String recipients,String subject,Event event) {
+        String emailContent = getEmailContent(event);
 
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
@@ -57,14 +61,14 @@ public class EmailServiceImpl implements EmailService{
     }
 
     @Override
-    public void sendCalenderInvite(CalenderDto calenderDto) throws IOException, MessagingException {
+    public void sendCalenderInvite(CalenderDto calenderDto, Event event) throws IOException, MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         mimeMessage.setRecipients(Message.RecipientType.TO, getToAddress(calenderDto.getAttendees()));
         mimeMessage.setSubject(calenderDto.getSubject());
         MimeMultipart mimeMultipart = new MimeMultipart("mixed");
         mimeMultipart.addBodyPart(createCalenderMimeBody(calenderDto));
 
-        String emailContent = getEmailContent();
+        String emailContent = getEmailContent(event);
         MimeBodyPart emailBodyPart = new MimeBodyPart();
         emailBodyPart.setContent(emailContent, "text/html; charset=utf-8");
         mimeMultipart.addBodyPart(emailBodyPart);
@@ -126,15 +130,48 @@ public class EmailServiceImpl implements EmailService{
         return Date.from(instant);
     }
 
+//    @Override
+//    public String getEmailContent(Event event)
+//    {
+//        try {
+//            ClassPathResource resource = new ClassPathResource("templates/check.html");
+//            byte[] bytes = Files.readAllBytes(Paths.get(resource.getURI()));
+//            return new String(bytes);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return "Error loading email content";
+//        }
+//    }
+
     @Override
-    public String getEmailContent() {
+    public String getEmailContent(Event event) {
         try {
             ClassPathResource resource = new ClassPathResource("templates/check.html");
-            byte[] bytes = Files.readAllBytes(Paths.get(resource.getURI()));
-            return new String(bytes);
+            String htmlTemplate = new String(Files.readAllBytes(Paths.get(resource.getURI())), StandardCharsets.UTF_8);
+
+            // Replace placeholders in the HTML template with actual event details
+            htmlTemplate = htmlTemplate.replace("${event.title}", event.getTitle());
+            htmlTemplate = htmlTemplate.replace("${event.duration}", String.valueOf(event.getDuration()));
+            htmlTemplate = htmlTemplate.replace("${event.host.name}", event.getHost().getName());
+            htmlTemplate = htmlTemplate.replace("${event.host.email}", event.getHost().getEmail());
+            htmlTemplate = htmlTemplate.replace("${event.eventLink}", event.getEventLink());
+            htmlTemplate = htmlTemplate.replace("${event.description}", event.getDescription());
+
+            // Replace host availability
+            StringBuilder availabilityHtml = new StringBuilder();
+            for (Availability availability : event.getAvailableHoursByDays()) {
+                availabilityHtml.append("<tr>")
+                        .append("<td>").append(availability.getDay()).append("</td>")
+                        .append("<td>").append(availability.getStartTime()).append("</td>")
+                        .append("<td>").append(availability.getEndTime()).append("</td>")
+                        .append("</tr>");
+            }
+            htmlTemplate = htmlTemplate.replace("${host.availability}", availabilityHtml.toString());
+            return htmlTemplate;
         } catch (IOException e) {
             e.printStackTrace();
             return "Error loading email content";
         }
     }
+
 }
