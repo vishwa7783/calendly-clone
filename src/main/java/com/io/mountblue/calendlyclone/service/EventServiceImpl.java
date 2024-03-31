@@ -1,0 +1,28 @@
+package com.io.mountblue.calendlyclone.service;
+
+import com.io.mountblue.calendlyclone.Repository.EventRepository;
+import com.io.mountblue.calendlyclone.entity.Event;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
+public class EventServiceImpl implements EventService{
+    EventRepository eventRepository;
+
+    @Autowired
+    public EventServiceImpl(EventRepository eventRepository) {
+        this.eventRepository = eventRepository;
+    }
+
+    @Transactional
+    @Override
+    public void save(Event event) {
+        eventRepository.save(event);
+    }
+
+    @Override
+    public Event findByEventLink(String eventLink) {
+        return eventRepository.findByEventLink(eventLink);
+    }
+}

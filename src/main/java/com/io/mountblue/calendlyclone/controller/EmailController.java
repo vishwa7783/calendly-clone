@@ -33,6 +33,7 @@ public class EmailController {
                             @RequestParam("recipients") String recipients,
                             @RequestParam("subject") String subject,Model model) {
 
+
         Event event=(Event)model.getAttribute("event");
         emailService.sendEmail(sender,recipients,subject,event);
 
@@ -56,6 +57,7 @@ public class EmailController {
         attendees.add(attendee1);
         attendees.add(attendee2);
         Event event = (Event) model.getAttribute("event");
+
         calenderDto.setAttendees(attendees);
         emailService.sendCalenderInvite(calenderDto,event);
         return "redirect:/event_types";
