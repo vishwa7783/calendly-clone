@@ -6,6 +6,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class EventServiceImpl implements EventService{
     EventRepository eventRepository;
@@ -24,5 +26,15 @@ public class EventServiceImpl implements EventService{
     @Override
     public Event findByEventLink(String eventLink) {
         return eventRepository.findByEventLink(eventLink);
+    }
+
+    @Override
+    public List<Event> findEventsByHostId(int hostId) {
+        return eventRepository.findByHostId(hostId);
+    }
+
+    @Override
+    public Event findEventById(int eventId) {
+        return eventRepository.findById(eventId);
     }
 }

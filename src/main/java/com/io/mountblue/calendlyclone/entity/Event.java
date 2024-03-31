@@ -1,7 +1,7 @@
 package com.io.mountblue.calendlyclone.entity;
 
+import biweekly.property.DurationProperty;
 import jakarta.persistence.*;
-import org.antlr.v4.runtime.misc.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
