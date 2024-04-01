@@ -45,23 +45,6 @@ public class EmailServiceImpl implements EmailService{
         String emailContent = getEmailContent(event);
     }
 
-//    @Override
-//    public void sendEmail(String sender,String recipients,String subject) {
-//        String emailContent = getEmailContent();
-//
-//        try {
-//            MimeMessage message = javaMailSender.createMimeMessage();
-//            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-//            helper.setFrom(sender);
-//            helper.setTo(recipients.split(","));
-//            helper.setSubject(subject);
-//            helper.setText(emailContent, true);
-//            javaMailSender.send(message);
-//        } catch (jakarta.mail.MessagingException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
     @Override
     public void sendCalenderInvite(CalenderDto calenderDto, Event event) throws IOException, MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
