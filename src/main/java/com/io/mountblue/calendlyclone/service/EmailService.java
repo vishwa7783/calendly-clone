@@ -8,7 +8,11 @@ import jakarta.mail.MessagingException;
 import java.io.IOException;
 
 public interface EmailService {
+
     void sendEmail(String sender,String recipients,String subject,Event event);
+
+//    void sendEmail(String sender,String recipients,String subject);
+
 
     void sendCalenderInvite(CalenderDto calenderDto, Event event) throws IOException, MessagingException;
 

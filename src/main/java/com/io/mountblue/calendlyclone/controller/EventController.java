@@ -74,7 +74,7 @@ public class EventController {
     }
 
     @GetMapping("/saveEvent")
-    public String createEvent(@AuthenticationPrincipal UserDetails userDetails, @ModelAttribute("event") Event event, Model model)
+    public String saveEvent(@AuthenticationPrincipal UserDetails userDetails, @ModelAttribute("event") Event event, Model model)
     {
         String meetingId = UUID.randomUUID().toString();
         User host = userService.findUserByEmail(userDetails.getUsername());
@@ -95,7 +95,7 @@ public class EventController {
 
         model.addAttribute("event",theEvent);
 
-        return "check";
+        return "event-details";
     }
 
     @GetMapping("/scheduled_events")
@@ -107,12 +107,12 @@ public class EventController {
         return "scheduled-events";
     }
 
-
     @GetMapping("/event/{eventId}")
     public String seeEventDetails(@PathVariable("eventId") int eventId, Model model){
         Event event = eventService.findEventById(eventId);
         model.addAttribute("event", event);
-        return "check";
+
+        return "event-details";
     }
 
     @PostMapping("/event/delete/{eventId}")
@@ -138,12 +138,10 @@ public class EventController {
     @PostMapping("/event/update/{eventId}")
     public String updateEvent(@PathVariable("eventId") int eventId, @ModelAttribute("event") Event updatedEvent, Model model) {
         Event event = eventService.findEventById(eventId);
-
         event.setTitle(updatedEvent.getTitle());
         event.setDescription(updatedEvent.getDescription());
         event.setDuration(updatedEvent.getDuration());
         event.setPlatform(updatedEvent.getPlatform());
-
 
         List<Availability> updatedAvailability = updatedEvent.getAvailableHoursByDays();
         for (int i = 0; i < updatedAvailability.size(); i++) {
@@ -156,5 +154,6 @@ public class EventController {
         eventService.save(event);
         return "redirect:/scheduled_events";
     }
+
 
 }

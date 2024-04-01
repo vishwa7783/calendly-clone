@@ -2,10 +2,10 @@ package com.io.mountblue.calendlyclone.controller;
 
 import com.io.mountblue.calendlyclone.entity.Event;
 import com.io.mountblue.calendlyclone.service.EmailService;
+import com.io.mountblue.calendlyclone.service.EventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -13,8 +13,6 @@ import biweekly.property.Attendee;
 import com.io.mountblue.calendlyclone.dto.CalenderDto;
 import jakarta.mail.MessagingException;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +21,14 @@ import java.util.List;
 public class EmailController {
     private EmailService emailService;
 
+    private EventService eventService;
+
     @Autowired
-    public EmailController(EmailService emailService) {
+    public EmailController(EmailService emailService, EventService eventService) {
         this.emailService = emailService;
+        this.eventService = eventService;
     }
+
 
     @PostMapping("/sendEmail")
     public String sendEmail(@RequestParam("sender") String sender,
@@ -40,9 +42,12 @@ public class EmailController {
         return "redirect:/dashboard";
     }
 
-    @GetMapping("/calDtoDetails")
-    public String calDetails(Model model){
+    @GetMapping("/calDtoDetails/{eventId}")
+    public String calDetails(Model model, @PathVariable("eventId") int eventId){
+
         CalenderDto calenderDto = new CalenderDto();
+
+        model.addAttribute("eventId", eventId);
         model.addAttribute("calenderDto", calenderDto);
         return "calendar-invite";
     }
@@ -51,7 +56,7 @@ public class EmailController {
     public String sendCalendar(@ModelAttribute CalenderDto calenderDto, @ModelAttribute("emails") String emails,Model model) throws MessagingException, IOException {
         List<Attendee> attendees = new ArrayList<>();
         System.out.println(emails);
-        System.out.println("\n"+calenderDto.getAttendees());
+        System.out.println("\n" + calenderDto.getAttendees());
         Attendee attendee1 = new Attendee("vishwa", "vishwjeet7783@gmail.com");
         Attendee attendee2 = new Attendee("Harsha", "harsha113@gmail.com");
         attendees.add(attendee1);
@@ -59,8 +64,23 @@ public class EmailController {
         Event event = (Event) model.getAttribute("event");
 
         calenderDto.setAttendees(attendees);
-        emailService.sendCalenderInvite(calenderDto,event);
+        emailService.sendCalenderInvite(calenderDto, event);
         return "redirect:/event_types";
+    }
+
+    @PostMapping("/send/{eventId}")
+    public String sendCalendar(@ModelAttribute CalenderDto calenderDto,
+                               @ModelAttribute("email") String email,
+                               @ModelAttribute("name") String name,
+                               @PathVariable("eventId") int eventId) throws MessagingException, IOException {
+        Event event = eventService.findEventById(eventId);
+        List<Attendee> attendees = new ArrayList<>();
+        Attendee attendee = new Attendee(name, email);
+        attendees.add(attendee);
+
+        calenderDto.setAttendees(attendees);
+        emailService.sendCalenderInvite(calenderDto, event);
+        return "redirect:/dashboard";
     }
 
 }

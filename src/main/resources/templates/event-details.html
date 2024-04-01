@@ -1,28 +1,53 @@
 <!DOCTYPE html>
-<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Details</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<form th:object="${emailDto}" method="post" th:action="@{/submitEmail}" >
-    <label>From:</label>
-    <input type="text" th:field="*{from}" required/><br/>
+<div class="container">
 
-    <label>To:</label>
-    <input type="text" th:field="*{to}" required/><br/>
+    <h1>Event Details</h1>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Event Host</h5>
+            <p class="card-text">Host Name: <strong th:text="${event.host.name}"></strong></p>
+            <p class="card-text">Host Email: <strong th:text="${event.host.email}"></strong></p>
+        </div>
+    </div>
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">Event Information</h5>
+            <p class="card-text">Event Name: <strong th:text="${event.title}"></strong></p>
+            <p class="card-text">Duration: <strong th:text="${event.duration} + ' minutes'"></strong></p>
+            <p class="card-text">Event Link: <a th:href="${event.eventLink}" target="_blank" th:text="${event.eventLink}"></a></p>
+            <p class="card-text">Description: <strong th:text="${event.description}"></strong></p>
+        </div>
+    </div>
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">Host Availability</h5>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="availability : ${event.availableHoursByDays}">
+                    <td th:text="${availability.day}"></td>
+                    <td th:text="${availability.startTime}"></td>
+                    <td th:text="${availability.endTime}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    <label>To (List):</label>
-    <input type="text" th:field="*{toList}" /><br/>
-
-    <label>Message:</label>
-    <textarea th:field="*{message}" required></textarea><br/>
-
-    <label>Subject:</label>
-    <input type="text" th:field="*{subject}" required/><br/>
-
-    <button type="submit">Submit</button>
-</form>
-
+</div>
 </body>
 </html>

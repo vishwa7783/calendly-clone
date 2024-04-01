@@ -8,7 +8,6 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
         }
         h2 {
             text-align: center;
@@ -17,10 +16,8 @@
         form {
             width: 400px;
             margin: 0 auto;
-            background-color: #fff;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         div {
             margin-bottom: 10px;
@@ -40,48 +37,32 @@
         }
         button[type="submit"] {
             padding: 10px 20px;
-            background-color: #007bff;
-            color: #fff;
             border: none;
             border-radius: 4px;
             cursor: pointer;
-        }
-        button[type="submit"]:hover {
-            background-color: #0056b3;
         }
     </style>
 
 </head>
 <body>
 <h2>Send Calendar</h2>
-<form th:action="@{/sendCalendar}" th:object="${calenderDto}" method="post">
+<form th:action="@{'/send/'+${eventId}}" th:object="${calenderDto}" method="post">
     <div>
         <label for="subject">Subject:</label>
-        <input type="text" id="subject" th:field="*{subject}">
+        <input type="text" id="subject" th:field="*{subject}" required>
     </div>
-    <div>
-        <label for="description">Description:</label>
-        <input type="text" id="description" th:field="*{description}">
-    </div>
-    <div>
-        <label for="summary">Summary:</label>
-        <input type="text" id="summary" th:field="*{summary}">
-    </div>
-    <div>
-        <label for="organizer">Organizer:</label>
-        <input type="text" id="organizer" th:field="*{organizer}">
-    </div>
-    <div>
-        <label for="meetingLink">Meeting Link:</label>
-        <input type="text" id="meetingLink" th:field="*{meetingLink}">
-    </div>
+
     <div>
         <label for="eventDateTime">Event Date Time:</label>
-        <input type="datetime-local" id="eventDateTime" th:field="*{eventDateTime}">
+        <input type="datetime-local" id="eventDateTime" th:field="*{eventDateTime}" required>
     </div>
     <div>
-        <label for="attendees">Attendees:</label>
-        <input type="text" id="attendees" name="emails" th:value="${emails}">
+        <label for="attendee-name">Attendee Name:</label>
+        <input type="text" id="attendee-name" name="name" th:value="${name}" required>
+    </div>
+    <div>
+        <label for="attendee-mail">Attendees Email:</label>
+        <input type="text" id="attendee-mail" name="email" th:value="${email}" required>
     </div>
     <div>
         <button type="submit">Send Calendar</button>
