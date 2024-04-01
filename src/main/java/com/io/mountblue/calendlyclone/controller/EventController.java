@@ -13,6 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalTime;
 import java.util.*;
@@ -72,7 +74,7 @@ public class EventController {
     }
 
     @GetMapping("/saveEvent")
-    public String createEvent(@AuthenticationPrincipal UserDetails userDetails, @ModelAttribute("event") Event event, Model model)
+    public String saveEvent(@AuthenticationPrincipal UserDetails userDetails, @ModelAttribute("event") Event event, Model model)
     {
         String meetingId = UUID.randomUUID().toString();
         User host = userService.findUserByEmail(userDetails.getUsername());
@@ -94,5 +96,21 @@ public class EventController {
         model.addAttribute("event",theEvent);
 
         return "check";
+    }
+
+    @GetMapping("/scheduled_events")
+    public String getScheduledEvents(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        User user = userService.findUserByEmail(userDetails.getUsername());
+        List<Event> events = eventService.findEventsByHostId(user.getId());
+        model.addAttribute("events", events);
+
+        return "scheduled-events";
+    }
+
+    @GetMapping("/event/{eventId}")
+    public String seeEventDetails(@PathVariable("eventId") int eventId, Model model){
+        Event event = eventService.findEventById(eventId);
+        model.addAttribute("event", event);
+        return "event-details";
     }
 }

@@ -7,7 +7,7 @@ import biweekly.property.Attendee;
 import biweekly.property.Method;
 import biweekly.util.Duration;
 import com.io.mountblue.calendlyclone.dto.CalenderDto;
-import com.io.mountblue.calendlyclone.dto.EmailDto;
+import com.io.mountblue.calendlyclone.entity.Event;
 import jakarta.activation.DataHandler;
 import jakarta.activation.DataSource;
 import jakarta.mail.Address;
@@ -17,87 +17,84 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.*;
 import jakarta.mail.util.ByteArrayDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.StringWriter;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class EmailServiceImpl implements EmailService{
     @Autowired
     private JavaMailSender javaMailSender;
 
-    @Override
-    public void sendEmail(String sender,String recipients,String subject) {
-        String emailContent = getEmailContent();
+    @Autowired
+    TemplateEngine templateEngine;
 
-        try {
-            MimeMessage message = javaMailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-            helper.setFrom(sender);
-            helper.setTo(recipients.split(","));
-            helper.setSubject(subject);
-            helper.setText(emailContent, true);
-            javaMailSender.send(message);
-        } catch (jakarta.mail.MessagingException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    @Override
+//    public void sendEmail(String sender,String recipients,String subject) {
+//        String emailContent = getEmailContent();
+//
+//        try {
+//            MimeMessage message = javaMailSender.createMimeMessage();
+//            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+//            helper.setFrom(sender);
+//            helper.setTo(recipients.split(","));
+//            helper.setSubject(subject);
+//            helper.setText(emailContent, true);
+//            javaMailSender.send(message);
+//        } catch (jakarta.mail.MessagingException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     @Override
-    public void sendCalenderInvite(CalenderDto calenderDto) throws IOException, MessagingException {
+    public void sendCalenderInvite(CalenderDto calenderDto, Event event) throws IOException, MessagingException {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
         mimeMessage.setRecipients(Message.RecipientType.TO, getToAddress(calenderDto.getAttendees()));
         mimeMessage.setSubject(calenderDto.getSubject());
         MimeMultipart mimeMultipart = new MimeMultipart("mixed");
-        mimeMultipart.addBodyPart(createCalenderMimeBody(calenderDto));
+        mimeMultipart.addBodyPart(createCalenderMimeBody(calenderDto,event));
 
-        String emailContent = getEmailContent();
+        String emailContent = getEmailContent(event);
         MimeBodyPart emailBodyPart = new MimeBodyPart();
         emailBodyPart.setContent(emailContent, "text/html; charset=utf-8");
         mimeMultipart.addBodyPart(emailBodyPart);
 
         mimeMessage.setContent(mimeMultipart);
         javaMailSender.send(mimeMessage);
-
     }
 
-    private BodyPart createCalenderMimeBody(CalenderDto calenderDto) throws MessagingException, IOException {
+    private BodyPart createCalenderMimeBody(CalenderDto calenderDto, Event event) throws MessagingException, IOException {
         MimeBodyPart calenderBody = new MimeBodyPart();
 
-        final DataSource source = new ByteArrayDataSource(createCal(calenderDto), "text/calender; charset=UTF-8");
+        final DataSource source = new ByteArrayDataSource(createCal(calenderDto, event), "text/calender; charset=UTF-8");
         calenderBody.setDataHandler(new DataHandler(source));
         calenderBody.setHeader("Content-Type", "text/calendar; charset=UTF-8; method=REQUEST");
 
         return calenderBody;
     }
 
-    private String createCal(CalenderDto calenderDto) {
+    private String createCal(CalenderDto calenderDto, Event theEvent) {
         ICalendar ical = new ICalendar();
         ical.addProperty(new Method(Method.REQUEST));
-        ical.setUrl(calenderDto.getMeetingLink());
+        ical.setUrl(calenderDto.getMeetingLink());  //event meet link
 
         VEvent event = new VEvent();
-        event.setUrl(calenderDto.getMeetingLink());
+        event.setUrl(theEvent.getEventLink());
         event.setSummary(calenderDto.getSummary());
-        event.setDescription(calenderDto.getDescription());
+        event.setDescription(theEvent.getDescription());
         event.setDateStart(getStartDate(calenderDto.getEventDateTime()));
-        event.setDuration(new Duration.Builder()
-                .hours(1)
-                .build());
-        event.setOrganizer(calenderDto.getOrganizer());
+        event.setDuration(new Duration.Builder().minutes(theEvent.getDuration()).build());
+        event.setOrganizer(theEvent.getHost().getName());
+
         addAttendees(event, calenderDto.getAttendees());
         ical.addEvent(event);
         return Biweekly.write(ical).go();
@@ -127,14 +124,14 @@ public class EmailServiceImpl implements EmailService{
     }
 
     @Override
-    public String getEmailContent() {
-        try {
-            ClassPathResource resource = new ClassPathResource("templates/check.html");
-            byte[] bytes = Files.readAllBytes(Paths.get(resource.getURI()));
-            return new String(bytes);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "Error loading email content";
-        }
+    public String getEmailContent(Event event) {
+        Context thymeleafContext = new Context();
+        thymeleafContext.setVariable("event", event);
+
+        StringWriter stringWriter = new StringWriter();
+        templateEngine.process("event-details", thymeleafContext, stringWriter);
+        String emailContent = stringWriter.toString();
+
+        return emailContent;
     }
 }
