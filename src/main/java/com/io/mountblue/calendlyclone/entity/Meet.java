@@ -33,6 +33,17 @@ public class Meet {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "meetLink")
+    private String meetLink;
+
+    public String getMeetLink() {
+        return meetLink;
+    }
+
+    public void setMeetLink(String meetLink) {
+        this.meetLink = meetLink;
+    }
+
     @ManyToOne(cascade = {CascadeType.MERGE,CascadeType.DETACH,CascadeType.PERSIST,CascadeType.REFRESH})
     @JoinColumn(name = "user_id")
     private User host;

@@ -4,41 +4,91 @@
     <meta charset="UTF-8">
     <title>Register Form</title>
     <style>
-        body{
-            border:2px solid black;
-            margin:50px;
-            width:450px;
-            height:300px;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-         p, .signup{
-            text-align:center;
-            font-size:large;
+
+        .container {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            padding: 20px;
+            width: 400px;
         }
-        .already-exist{
-            color:red;
-            font-size:large;
+
+        h2, p, .signup {
+            text-align: center;
+            font-size: large;
+        }
+
+        .already-exist {
+            color: red;
+            font-size: large;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="submit"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .already-exist input[type="submit"] {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .already-exist input[type="submit"]:hover {
+            background-color: #dc3545;
         }
     </style>
 </head>
 <body>
-<form class="signup" th:action="@{/saveUser}" th:object="${user}" method="post" >
-    <h2> Register Below</h2>
-    <p>
-        Username: <input type="text" name="name" th:field="*{name}" required>
+<div class="container">
+    <form class="signup" th:action="@{/saveUser}" th:object="${user}" method="post">
+        <h2>Register Below</h2>
+        <p>
+            Username: <input type="text" name="name" th:field="*{name}" required>
+        </p>
+        <p>
+            Email: <input type="email" name="email" th:field="*{email}" required>
+        </p>
+        <p>
+            Password: <input type="password" name="password" th:field="*{password}" required>
+        </p>
+        <input type="submit" value="Register">
+    </form>
+    <p th:if="${emailExists}">
+        <a th:href="@{/login}"><input class="already-exist" type="submit" value="Email id already exists. Back to login"></a>
     </p>
-    <p>
-        Email: <input type="email" name="email" th:field="*{email}" required>
+    <p th:if="${!emailExists}">Already a user.
+        <a th:href="@{/login}"><input type="submit" value="Back to login"></a>
     </p>
-    <p>
-        Password: <input type="password" name="password" th:field="*{password}" required>
-    </p>
-    <input type="submit" value="Register">
-</form>
-<p th:if="${emailExists}">
-    <a th:href="@{/login}" ><input class="already-exist" type="submit" value="Email id already exists.Back to login"></a>
-</p>
-<p th:if="${!emailExists}">Already a user.
-    <a th:href="@{/login}"><input type="submit" value="Back to login"></a>
-</p>
+</div>
 </body>
 </html>

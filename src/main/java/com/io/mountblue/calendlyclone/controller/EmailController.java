@@ -4,6 +4,7 @@ import com.io.mountblue.calendlyclone.service.EmailService;
 import com.io.mountblue.calendlyclone.service.EventService;
 import com.io.mountblue.calendlyclone.dto.CalenderDto;
 
+import com.io.mountblue.calendlyclone.service.MeetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -21,10 +22,13 @@ public class EmailController {
 
     private EventService eventService;
 
+    private MeetService meetService;
+
     @Autowired
-    public EmailController(EmailService emailService, EventService eventService) {
+    public EmailController(EmailService emailService, EventService eventService, MeetService meetService) {
         this.emailService = emailService;
         this.eventService = eventService;
+        this.meetService = meetService;
     }
 
     @PostMapping("/sendEmail")
@@ -48,33 +52,18 @@ public class EmailController {
 
     @PostMapping("/send/{eventId}")
     public String sendCalendar(@ModelAttribute CalenderDto calenderDto,
-                               @ModelAttribute("email") String email,
-                               @ModelAttribute("name") String name,
+                               @RequestParam("email") String email,
+                               @RequestParam("name") String name,
                                @PathVariable("eventId") int eventId) throws MessagingException, IOException {
         Event event = eventService.findEventById(eventId);
         List<Attendee> attendees = new ArrayList<>();
         Attendee attendee = new Attendee(name, email);
         attendees.add(attendee);
 
+        meetService.saveMeet(name, email, event, calenderDto);
         calenderDto.setAttendees(attendees);
         emailService.sendCalenderInvite(calenderDto, event);
         return "redirect:/dashboard";
     }
-
-    @PostMapping("/sendCalendar")
-    public String sendCalendar(@ModelAttribute CalenderDto calenderDto, @ModelAttribute("emails") String emails,Model model) throws MessagingException, IOException {
-        List<Attendee> attendees = new ArrayList<>();
-        Attendee attendee1 = new Attendee("vishwa", "vishwjeet7783@gmail.com");
-        Attendee attendee2 = new Attendee("Harsha", "harsha113@gmail.com");
-        attendees.add(attendee1);
-        attendees.add(attendee2);
-
-        Event event = (Event) model.getAttribute("event");
-        calenderDto.setAttendees(attendees);
-        emailService.sendCalenderInvite(calenderDto,event);
-
-        return "redirect:/event_types";
-    }
-
 }
 

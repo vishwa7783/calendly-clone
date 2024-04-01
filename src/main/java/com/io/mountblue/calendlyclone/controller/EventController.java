@@ -50,7 +50,6 @@ public class EventController {
 
     @GetMapping("event_types/solo")
     public String eventTypeSolo(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        System.out.println(userDetails.getUsername());
         Event event = new Event();
         String[] days={"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
 
@@ -133,7 +132,6 @@ public class EventController {
         model.addAttribute("event", event);
         return "update-event";
     }
-
 
     @PostMapping("/event/update/{eventId}")
     public String updateEvent(@PathVariable("eventId") int eventId, @ModelAttribute("event") Event updatedEvent, Model model) {
