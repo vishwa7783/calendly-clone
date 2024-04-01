@@ -13,6 +13,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.LocalTime;
 import java.util.*;
@@ -95,4 +97,64 @@ public class EventController {
 
         return "check";
     }
+
+    @GetMapping("/scheduled_events")
+    public String getScheduledEvents(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        User user = userService.findUserByEmail(userDetails.getUsername());
+        List<Event> events = eventService.findEventsByHostId(user.getId());
+        model.addAttribute("events", events);
+
+        return "scheduled-events";
+    }
+
+
+    @GetMapping("/event/{eventId}")
+    public String seeEventDetails(@PathVariable("eventId") int eventId, Model model){
+        Event event = eventService.findEventById(eventId);
+        model.addAttribute("event", event);
+        return "check";
+    }
+
+    @PostMapping("/event/delete/{eventId}")
+    public String deleteEvent(@PathVariable("eventId") int eventId, @AuthenticationPrincipal UserDetails userDetails,Model model) {
+        User user = userService.findUserByEmail(userDetails.getUsername());
+        List<Event> events = eventService.findEventsByHostId(user.getId());
+        if(!events.isEmpty()){
+            model.addAttribute("events",events);
+        }
+        eventService.deleteEventById(eventId);
+
+        return "redirect:/scheduled_events";
+    }
+
+    @GetMapping("/event/update/{eventId}")
+    public String showUpdateForm(@PathVariable("eventId") int eventId, Model model) {
+        Event event = eventService.findEventById(eventId);
+        model.addAttribute("event", event);
+        return "update-event";
+    }
+
+
+    @PostMapping("/event/update/{eventId}")
+    public String updateEvent(@PathVariable("eventId") int eventId, @ModelAttribute("event") Event updatedEvent, Model model) {
+        Event event = eventService.findEventById(eventId);
+
+        event.setTitle(updatedEvent.getTitle());
+        event.setDescription(updatedEvent.getDescription());
+        event.setDuration(updatedEvent.getDuration());
+        event.setPlatform(updatedEvent.getPlatform());
+
+
+        List<Availability> updatedAvailability = updatedEvent.getAvailableHoursByDays();
+        for (int i = 0; i < updatedAvailability.size(); i++) {
+            Availability availability = event.getAvailableHoursByDays().get(i);
+            availability.setStartTime(updatedAvailability.get(i).getStartTime());
+            availability.setEndTime(updatedAvailability.get(i).getEndTime());
+
+        }
+
+        eventService.save(event);
+        return "redirect:/scheduled_events";
+    }
+
 }
