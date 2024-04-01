@@ -1,17 +1,22 @@
 package com.io.mountblue.calendlyclone.controller;
-
 import com.io.mountblue.calendlyclone.entity.Availability;
 import com.io.mountblue.calendlyclone.entity.Event;
 import com.io.mountblue.calendlyclone.entity.User;
 import com.io.mountblue.calendlyclone.service.AvailabilityService;
 import com.io.mountblue.calendlyclone.service.EventService;
 import com.io.mountblue.calendlyclone.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.LocalTime;
 import java.util.*;
@@ -19,6 +24,8 @@ import java.util.*;
 
 @Controller
 public class EventController {
+    @Value("${server.port}")
+    private int serverPort;
 
     EventService eventService;
     UserService userService;
@@ -48,7 +55,6 @@ public class EventController {
 
     @GetMapping("event_types/solo")
     public String eventTypeSolo(Model model, @AuthenticationPrincipal UserDetails userDetails){
-        System.out.println(userDetails.getUsername());
         Event event = new Event();
         String[] days={"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
         List<Availability> availabilities = new ArrayList<>();
@@ -68,7 +74,7 @@ public class EventController {
         Event event = new Event();
         model.addAttribute("event", event);
 
-        return "group-event";
+        return "solo-event";
     }
 
     @GetMapping("/saveEvent")
@@ -89,8 +95,7 @@ public class EventController {
             availability.setEvent(theEvent);
             availabilityService.save(availability);
         }
-        String eventnewlink = "http://localhost:8090/event/" + theEvent.getId() + "/select-date-time?eventId=" + meetingId;
-        event.setEventLink(eventnewlink);
+        String eventnewlink = "http://localhost:" + serverPort + "/event/" + theEvent.getId() + "/select-date-time?eventId=" + meetingId;        event.setEventLink(eventnewlink);
         eventService.save(event);
         model.addAttribute("event",theEvent);
 
@@ -133,7 +138,6 @@ public class EventController {
         return "update-event";
     }
 
-
     @PostMapping("/event/update/{eventId}")
     public String updateEvent(@PathVariable("eventId") int eventId, @ModelAttribute("event") Event updatedEvent, Model model) {
         Event event = eventService.findEventById(eventId);
@@ -165,16 +169,13 @@ public class EventController {
     }
 
     @GetMapping("/event/schedule-meetings")
-    public String scheduleMeeting(@RequestParam("eventId") int eventId,
-                                  @RequestParam("selectedDate") String selectDate,
+    public String scheduleMeeting(@RequestParam("selectedDate") String selectDate,
                                   @RequestParam("selectedTime") String selectTime,
                                   Model model) {
         model.addAttribute("selectedDate", selectDate);
         model.addAttribute("selectedTime", selectTime);
-        System.out.println(eventId);
-        System.out.println(selectDate);
-        System.out.println(selectTime);
-        String meetingLink = "https://your-meeting-link.com/" + eventId;
+
+        String meetingLink = "https://nextjs-zegocloud-uikits-sooty-three.vercel.app/";
         model.addAttribute("meetingLink", meetingLink);
 
         return "meeting-details";

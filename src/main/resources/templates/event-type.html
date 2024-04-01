@@ -5,51 +5,58 @@
     <title>Create New Event</title>
     <style>
         body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
             max-width: 600px;
             margin: 0 auto;
-            font-size:large;
+            padding: 20px;
+            font-size: 16px;
         }
         h1 {
             text-align: center;
-            margin-top: 50px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            font-size: 24px;
         }
         .event-type {
-            border: 2px solid black;
-            border-radius:10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
-            text-align: center;
+            transition: background-color 0.3s;
         }
         .event-type:hover {
             background-color: #f9f9f9;
         }
         .event-type a {
             text-decoration: none;
-            color: black;
+            color: #333;
         }
         .event-type h3 {
             margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 20px;
         }
         .event-type p {
-            margin-bottom: 0;
-            margin-top: 10px;
+            margin: 0;
+            font-size: 16px;
         }
     </style>
 </head>
 <body>
-    <h1>Create New Event Type</h1>
-    <div class="event-type">
-        <a  th:href="@{event_types/solo}">
-            <h3>One-on-One</h3>
-            <p>One host with one invitee</p>
-        </a>
-    </div>
-    <div class="event-type">
-        <a th:href="@{event_types/group}">
-            <h3>Group</h3>
-            <p>One host with group of invitees</p>
-        </a>
-    </div>
-
+<h1>Create New Event Type</h1>
+<div class="event-type">
+    <a th:href="@{event_types/solo}">
+        <h3>One-on-One</h3>
+        <p>One host with one invitee</p>
+    </a>
+</div>
+<div class="event-type">
+    <a th:href="@{event_types/group}">
+        <h3>Group</h3>
+        <p>One host with a group of invitees</p>
+    </a>
+</div>
 </body>
 </html>

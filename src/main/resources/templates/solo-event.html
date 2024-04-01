@@ -52,7 +52,7 @@
     }
     .availability-label{
        padding-top:10px;
-
+    }
     .calendar {
         border-collapse: collapse;
     }
@@ -67,7 +67,6 @@
     }
     .date:hover{
         color:blue;
->>>>>>> event-controller
     }
 
   </style>
@@ -130,7 +129,7 @@
           <option value="08:00">8:00 PM</option>
         </select>
 
-        <select th:id="'end-time-' + ${dayIndex}" th:field="*{availableHoursByDays[__${dayIndex.index}__].endTime}" class="availability-end-time">
+        <select th:id="'end-time-' + ${dayIndex}" th:field="*{availableHoursByDays[__${dayIndex.index}__].endTime}" class="availability-end-time" >
           <option value="09:00">9:00 AM</option>
           <option value="10:00">10:00 AM</option>
           <option value="11:00">11:00 AM</option>
