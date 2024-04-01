@@ -70,12 +70,12 @@ button {
 
 .sidebar{
  height:40vh;
- width:150px;
+ width:300px;
  display:grid;
  row-gap:30px;
  grid-template-column:100px;
  grid-template-rows:50px;
- border:2px solid red;
+ border:2px solid black;
  padding-top:20px;
 }
 
@@ -83,7 +83,7 @@ button {
 
     display:grid;
     row-gap:30px;
-    grid-template-columns:150px;
+    grid-template-columns:100px;
     grid-template-rows:50px;
 
 }

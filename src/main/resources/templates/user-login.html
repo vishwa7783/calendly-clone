@@ -4,45 +4,81 @@
     <meta charset="UTF-8">
     <title>Login Page</title>
     <style>
-        body{
-            border:2px solid black;
-            margin:50px;
-            width:450px;
-            height:270px;
-        }
-        .login-form, .signup
-        {
-            text-align:center;
-            width:400px;
-            font-size:large;
-        }
-        .failed{
-            color:red;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
 
+        .container {
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            padding: 20px;
+            width: 400px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        .login-form, .signup {
+            text-align: center;
+        }
+
+        .failed {
+            color: red;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="submit"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
-<form class="login-form" action="#" th:action="@{/authenticateTheUser}" method="post">
-    <h2> Login Here</h2>
-    <div th:if="${param.error}">
-        <i class="failed">Sorry! Enter a valid username and password....</i>
-    </div>
-    <P>
-        Email: <input type="text" name="username" placeholder="Enter email" required>
-    </P>
-    <p>
-        Password: <input type="password" name="password" placeholder="Enter password" required>
-    </p>
-    <input type="submit" value="Login" />
-</form>
+<div class="container">
+    <form class="login-form" action="#" th:action="@{/authenticateTheUser}" method="post">
+        <h2>Login Here</h2>
+        <div th:if="${param.error}">
+            <p class="failed">Sorry! Enter a valid username and password....</p>
+        </div>
+        <p>
+            Email: <input type="text" name="username" placeholder="Enter email" required>
+        </p>
+        <p>
+            Password: <input type="password" name="password" placeholder="Enter password" required>
+        </p>
+        <input type="submit" value="Login"/>
+    </form>
 
-<form class="signup" action="#" th:action="@{/registerForm}" >
-    <p>
-        Are you a new User?
-        <input type="submit" value="Register" >
-    </p>
-</form>
-
+    <form class="signup" action="#" th:action="@{/registerForm}">
+        <p>Are you a new User?
+            <input type="submit" value="Register">
+        </p>
+    </form>
+</div>
 </body>
 </html>

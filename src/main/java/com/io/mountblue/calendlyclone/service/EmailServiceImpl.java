@@ -6,6 +6,7 @@ import biweekly.component.VEvent;
 import biweekly.property.Attendee;
 import biweekly.property.Method;
 import biweekly.util.Duration;
+
 import com.io.mountblue.calendlyclone.dto.CalenderDto;
 import com.io.mountblue.calendlyclone.entity.Event;
 import jakarta.activation.DataHandler;
@@ -16,6 +17,7 @@ import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.*;
 import jakarta.mail.util.ByteArrayDataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -38,22 +40,10 @@ public class EmailServiceImpl implements EmailService{
     @Autowired
     TemplateEngine templateEngine;
 
-//    @Override
-//    public void sendEmail(String sender,String recipients,String subject) {
-//        String emailContent = getEmailContent();
-//
-//        try {
-//            MimeMessage message = javaMailSender.createMimeMessage();
-//            MimeMessageHelper helper = new MimeMessageHelper(message, true);
-//            helper.setFrom(sender);
-//            helper.setTo(recipients.split(","));
-//            helper.setSubject(subject);
-//            helper.setText(emailContent, true);
-//            javaMailSender.send(message);
-//        } catch (jakarta.mail.MessagingException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    @Override
+    public void sendEmail(String sender,String recipients,String subject,Event event) {
+        String emailContent = getEmailContent(event);
+    }
 
     @Override
     public void sendCalenderInvite(CalenderDto calenderDto, Event event) throws IOException, MessagingException {
