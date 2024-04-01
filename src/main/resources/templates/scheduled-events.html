@@ -51,17 +51,21 @@
         <td><span th:text="${event.duration}"></span></td>
         <td><span th:text="${event.platform}"></span></td>
         <td>
-            <form th:action="@{'/event/'+${event.id}}" method="get">
+            <span><form th:action="@{'/event/'+${event.id}}" method="get">
                 <input type="submit" value="See All Details">
             </form>
             <form th:action="@{'/calDtoDetails/'+${event.id}}" ><input type="submit" value="send"></form>
             <form th:action="@{'/event/delete/'+${event.id}}" method="post">
                 <input type="submit" value="Delete">
-            </form>
+            </form></span>
+            <span>
             <form th:action="@{'/event/update/'+${event.id}}" method="get">
                 <input type="submit" value="Update">
             </form>
+            <form th:action="@{'/calDtoDetails/'+${event.id}}" ><input type="submit" value="send"></form>
+            </span>
         </td>
+
     </tr>
     </tbody>
 </table>

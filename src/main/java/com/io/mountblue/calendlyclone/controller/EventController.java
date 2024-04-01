@@ -11,10 +11,12 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalTime;
 import java.util.*;
@@ -22,6 +24,7 @@ import java.util.*;
 
 @Controller
 public class EventController {
+
     EventService eventService;
     UserService userService;
     AvailabilityService availabilityService;
@@ -52,7 +55,6 @@ public class EventController {
     public String eventTypeSolo(Model model, @AuthenticationPrincipal UserDetails userDetails){
         Event event = new Event();
         String[] days={"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
-
         List<Availability> availabilities = new ArrayList<>();
         for (String day : days) {
             availabilities.add(new Availability(day, LocalTime.parse("00:00"), LocalTime.parse("00:00")));
@@ -69,6 +71,7 @@ public class EventController {
     public String eventTypeGroup(Model model){
         Event event = new Event();
         model.addAttribute("event", event);
+
         return "group-event";
     }
 
@@ -84,14 +87,15 @@ public class EventController {
         for (Availability availability : event.getAvailableHoursByDays()) {
             availability.setHost(host);
         }
-
         eventService.save(event);
         Event theEvent = eventService.findByEventLink(eventLink);
         for (Availability availability : theEvent.getAvailableHoursByDays()) {
             availability.setEvent(theEvent);
             availabilityService.save(availability);
         }
-
+        String eventnewlink = "http://localhost:8090/event/" + theEvent.getId() + "/select-date-time?eventId=" + meetingId;
+        event.setEventLink(eventnewlink);
+        eventService.save(event);
         model.addAttribute("event",theEvent);
 
         return "event-details";
@@ -146,11 +150,36 @@ public class EventController {
             Availability availability = event.getAvailableHoursByDays().get(i);
             availability.setStartTime(updatedAvailability.get(i).getStartTime());
             availability.setEndTime(updatedAvailability.get(i).getEndTime());
-
         }
         eventService.save(event);
 
         return "redirect:/scheduled_events";
     }
 
+    @GetMapping("/event/{eventId}/select-date-time")
+    public String selectDateTime(@PathVariable("eventId") int eventId, @RequestParam("eventId") String uniqueIdentifier, Model model){
+        Event event = eventService.findEventById(eventId);
+        if (event != null ) {
+            model.addAttribute("eventId", eventId);
+            return "select-date-time";
+        } else {
+            return "invalid-link";
+        }
+    }
+
+    @GetMapping("/event/schedule-meetings")
+    public String scheduleMeeting(@RequestParam("eventId") int eventId,
+                                  @RequestParam("selectedDate") String selectDate,
+                                  @RequestParam("selectedTime") String selectTime,
+                                  Model model) {
+        model.addAttribute("selectedDate", selectDate);
+        model.addAttribute("selectedTime", selectTime);
+        System.out.println(eventId);
+        System.out.println(selectDate);
+        System.out.println(selectTime);
+        String meetingLink = "https://your-meeting-link.com/" + eventId;
+        model.addAttribute("meetingLink", meetingLink);
+
+        return "meeting-details";
+    }
 }
