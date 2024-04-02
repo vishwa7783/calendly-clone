@@ -47,6 +47,7 @@ public class EmailController {
         CalenderDto calenderDto = new CalenderDto();
         model.addAttribute("eventId", eventId);
         model.addAttribute("calenderDto", calenderDto);
+        model.addAttribute("successful", false);
 
         if(event.getEventType().equals("solo")) {
             return "calendar-invite";
@@ -76,18 +77,20 @@ public class EmailController {
         meetService.saveMeet(name, email, event, calenderDto);
         calenderDto.setAttendees(attendees);
         emailService.sendCalenderInvite(calenderDto, event);
+        model.addAttribute("successful", true);
 
-        return "redirect:/dashboard";
+        return "calendar-invite";
     }
 
     @PostMapping("/send/group/{eventId}")
     public String sendGroupEvent(@ModelAttribute CalenderDto calenderDto,
                                  @RequestParam("emails") String mails,
                                  @RequestParam("names") String names,
-                                 @PathVariable("eventId") int eventId) throws MessagingException, IOException {
+                                 @PathVariable("eventId") int eventId, Model model) throws MessagingException, IOException {
         Event event = eventService.findEventById(eventId);
         if(eventService.setAttendees(names, mails, calenderDto)){
         emailService.sendCalenderInvite(calenderDto, event);
+        model.addAttribute("successful", true);
 
         return "calender-invite-group";
         }else{
