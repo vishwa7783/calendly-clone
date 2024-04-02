@@ -3,34 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <title>Creating New Event Type</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         .main{
-          padding:20px;
+          padding: 20px;
+          font-family: Arial, sans-serif; /* Change font style */
         }
         header{
-          width:300px;
+          width: 300px;
         }
         .event-form{
-          display:flex;
-          flex-direction:column;
-          align-items:left;
-          justify-content:left;
-          width:300px;
+          display: flex;
+          flex-direction: column;
+          align-items: left;
+          justify-content: left;
+          width: 300px;
         }
         .form-label {
           display: block;
           margin-bottom: 5px;
+          font-size: 16px;
+          color: #333;
         }
         .form-input, .form-select {
           width: 100%;
           padding: 8px;
           margin-bottom: 10px;
           box-sizing: border-box;
+          font-size: 16px;
+          border: 2px solid black; /* Increase border thickness */
         }
         .location-options {
           margin-bottom: 10px;
         }
-
         .location-option {
           margin-bottom: 5px;
         }
@@ -42,114 +48,121 @@
           border: none;
           border-radius: 4px;
           cursor: pointer;
-          border:2px solid black;
+          border: 2px solid black;
+          font-size: 16px;
         }
-
         .availability-option{
-           display:grid;
-           grid-template-columns:120px 120px;
-           column-gap:18px;
+          display: grid;
+          grid-template-columns: 120px 120px;
+          column-gap: 18px;
         }
         .availability-label{
-           padding-top:10px;
-
+          padding-top: 10px;
+        }
         .calendar {
-            border-collapse: collapse;
+          border-collapse: collapse;
         }
         .calendar th, .calendar td {
-            border: 1px solid black;
-            padding: 10px;
-            text-align: center;
+          border: 2px solid black; /* Increase border thickness */
+          padding: 10px;
+          text-align: center;
         }
-        .date{
-            text-decoration:none;
-            color:black;
+        .date {
+          text-decoration: none;
+          color: black;
         }
-        .date:hover{
-            color:blue;
+        .date:hover {
+          color: blue;
         }
-
+        .box-2 {
+          position: absolute;
+          top: 80px;
+          left: 600px;
+        }
     </style>
 </head>
 <body>
 <div class="main">
     <header>
-        <a th:href="@{/event_types}" class="cancel-link">cancel</a>
+        <a th:href="@{/event_types}" class="cancel-link">Cancel</a>
         <h3 class="title">New Event Type</h3>
         <hr>
     </header>
     <form  th:action="@{'/event/update/' + ${event.id}}" th:object="${event}" class="event-form" method="post">
-        <input type="hidden" th:field="*{id}">
         <label for="event_name" class="form-label">Event name *:</label>
-        <input id="event_name" type="text" th:field="*{title}" class="form-input" required>
+        <input id="event_name" type="text" th:field="*{title}" class="form-control form-input" required>
         <label for="time-duration" class="form-label">Duration *:</label>
-        <select id="time-duration" th:field="${event.duration}" class="form-select" required>
+        <select id="time-duration" th:field="${event.duration}" class="form-select form-control" required>
             <option value="15">15 minutes</option>
             <option value="30" selected>30 minutes</option>
             <option value="45">45 minutes</option>
             <option value="60">1 hour</option>
             <option value="90">1 hour 30 minutes</option>
             <option value="120">2 hours</option>
-        </select>
+        </select><br>
+
         <label class="form-label">Location:</label>
         <div class="location-options">
             <div class="location-option">
-                <input type="radio" id="location-1" th:field="*{platform}" th:value="zoom" class="location-radio" required>
-                <label for="location-1" class="location-label">Zoom</label>
+                <input type="radio" id="location-1" th:field="*{platform}" th:value="zoom" class="form-check-input" required>
+                <label for="location-1" class="form-check-label location-label"><i class="fas fa-video"></i> Zoom</label>
             </div>
             <div class="location-option">
-                <input type="radio" id="location-2" th:field="*{platform}" th:value="phone-call" class="location-radio" required>
-                <label for="location-2" class="location-label">Phone call</label>
+                <input type="radio" id="location-2" th:field="*{platform}" th:value="phone-call" class="form-check-input" required>
+                <label for="location-2" class="form-check-label location-label"><i class="fas fa-phone"></i> Phone call</label>
             </div>
             <div class="location-option">
-                <input type="radio" id="location-3" th:field="*{platform}" th:value="in-person" class="location-radio" required>
-                <label for="location-3" class="location-label">Google meeting</label>
+                <input type="radio" id="location-3" th:field="*{platform}" th:value="in-person" class="form-check-input" required>
+                <label for="location-3" class="form-check-label location-label"><i class="fas fa-users"></i> Google meeting</label>
             </div>
-        </div>
+        </div><br>
 
         <label for="event_description" class="form-label">Event Description:</label>
-        <textarea rows="10" cols="60" id="event_description"  th:field="*{description}" class="form-input" ></textarea>
+        <textarea rows="10" cols="60" id="event_description" th:field="*{description}" class="form-control form-input"></textarea>
+        <div class="box-2">
+            <label class="form-label">Availability:</label>
+            <div class="availability-options">
+                <div class="availability-option" th:each="availability, dayIndex : ${event.availableHoursByDays}">
+                    <input type="hidden" th:field="*{availableHoursByDays[__${dayIndex.index}__].day}" th:value="${availability.day}" />
+                    <label th:text="${availability.day}" class="availability-label"></label><br>
+                    <select th:id="'start-time-' + ${dayIndex}" th:field="*{availableHoursByDays[__${dayIndex.index}__].startTime}" class="availability-start-time form-select form-control">
+                        <option value="09:00">9:00 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="12:00">12:00 AM</option>
+                        <option value="01:00">1:00 PM</option>
+                        <option value="02:00">2:00 PM</option>
+                        <option value="03:00">3:00 PM</option>
+                        <option value="04:00">4:00 PM</option>
+                        <option value="05:00">5:00 PM</option>
+                        <option value="06:00">6:00 PM</option>
+                        <option value="07:00">7:00 PM</option>
+                        <option value="08:00">8:00 PM</option>
+                    </select>
 
-        <label class="form-label">Availability:</label>
-        <div class="availability-options">
-            <div class="availability-option" th:each="availability, dayIndex : ${event.availableHoursByDays}">
-                <input type="hidden" th:field="*{availableHoursByDays[__${dayIndex.index}__].day}" th:value="${availability.day}" />
-                <label th:text="${availability.day}" class="availability-label"></label><br>
-                <select th:id="'start-time-' + ${dayIndex}" th:field="*{availableHoursByDays[__${dayIndex.index}__].startTime}" class="availability-start-time">
-                    <option value="09:00">9:00 AM</option>
-                    <option value="10:00">10:00 AM</option>
-                    <option value="11:00">11:00 AM</option>
-                    <option value="12:00">12:00 AM</option>
-                    <option value="01:00">1:00 PM</option>
-                    <option value="02:00">2:00 PM</option>
-                    <option value="03:00">3:00 PM</option>
-                    <option value="04:00">4:00 PM</option>
-                    <option value="05:00">5:00 PM</option>
-                    <option value="06:00">6:00 PM</option>
-                    <option value="07:00">7:00 PM</option>
-                    <option value="08:00">8:00 PM</option>
-                </select>
-
-                <select th:id="'end-time-' + ${dayIndex}" th:field="*{availableHoursByDays[__${dayIndex.index}__].endTime}" class="availability-end-time">
-                    <option value="09:00">9:00 AM</option>
-                    <option value="10:00">10:00 AM</option>
-                    <option value="11:00">11:00 AM</option>
-                    <option value="12:00">12:00 AM</option>
-                    <option value="01:00">1:00 PM</option>
-                    <option value="02:00">2:00 PM</option>
-                    <option value="03:00">3:00 PM</option>
-                    <option value="04:00">4:00 PM</option>
-                    <option value="05:00">5:00 PM</option>
-                    <option value="06:00">6:00 PM</option>
-                    <option value="07:00">7:00 PM</option>
-                    <option value="08:00">8:00 PM</option>
-                </select>
+                    <select th:id="'end-time-' + ${dayIndex}" th:field="*{availableHoursByDays[__${dayIndex.index}__].endTime}" class="availability-end-time form-select form-control">
+                        <option value="09:00">9:00 AM</option>
+                        <option value="10:00">10:00 AM</option>
+                        <option value="11:00">11:00 AM</option>
+                        <option value="12:00">12:00 AM</option>
+                        <option value="01:00">1:00 PM</option>
+                        <option value="02:00">2:00 PM</option>
+                        <option value="03:00">3:00 PM</option>
+                        <option value="04:00">4:00 PM</option>
+                        <option value="05:00">5:00 PM</option>
+                        <option value="06:00">6:00 PM</option>
+                        <option value="07:00">7:00 PM</option>
+                        <option value="08:00">8:00 PM</option>
+                    </select>
+                </div>
             </div>
+            <input type="hidden" name="type" th:value="${type}">
+            <input type="submit" value="Continue" class="submit-button btn btn-primary">
         </div>
-
-        <input type="submit" value="Update" class="submit-button">
     </form>
 </div>
-</body>
-</html>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
+</body>
+
+</html>
