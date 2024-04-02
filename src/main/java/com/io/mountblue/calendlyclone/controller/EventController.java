@@ -108,7 +108,7 @@ public class EventController {
             availabilityService.save(availability);
         }
 
-        String eventnewlink = "http://localhost:" + serverPort + "/event/" + theEvent.getId() + "/select-date-time?eventId=" + meetingId;
+        String eventnewlink = "https://calendly-clone-73249cf67193.herokuapp.com/" + serverPort + "/event/" + theEvent.getId() + "/select-date-time?eventId=" + meetingId;
         event.setEventLink(eventnewlink);
         eventService.save(event);
         model.addAttribute("event",theEvent);
