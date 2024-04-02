@@ -1,34 +1,5 @@
 /*
-#box{
 
-    height:200px;
-    width:200px;
-    background-image:url("/calendlylogo.png");
-    background-size:contain;
-    background-repeat:no-repeat;
-}
-
-
-.navbar{
-
-    width:100%;
-    height: 100px;
-    border:2px solid black;
-    background-color: white;
-    display:grid;
-    column-gap: 1500px;
-    grid-template-columns: 100px 300px;
-    grid-template-rows: 50px;
-
-}
-
-.inbox{
-width:200px;
-padding-top:30px;
-display:grid;
-column-gap:10px;
-
-}*/
 
 #box {
     height: 200px;
@@ -91,4 +62,93 @@ button {
 a{
 padding-left:20px;
 
+}
+
+
+*/
+
+
+#box {
+    height: 200px;
+    width: 200px;
+    background-image: url("/calendlylogo.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.navbar {
+    width: 100%;
+    height: 100px;
+    border: 2px solid black;
+    background-color: white;
+    display: grid;
+    column-gap: 1400px;
+    grid-template-columns: 100px 300px;
+    grid-template-rows: 50px;
+}
+
+.inbox {
+    width: 200px;
+    padding-top: 30px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding-right: 100px;
+}
+
+button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 10px;
+    cursor: pointer;
+    width: 100px;
+}
+
+.sidebar {
+    height: 70vh;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    border: 2px solid black;
+    padding-top: 20px;
+    background-color: #343a40;
+    overflow-y: auto;
+    color: #fff;
+}
+
+.sidebar-header {
+    padding: 10px 20px;
+    border-bottom: 1px solid #6c757d;
+}
+
+.sidebar-header h3 {
+    margin: 0;
+}
+
+.sidebar-content {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.somebox {
+    display: grid;
+    row-gap: 30px;
+    grid-template-columns: 100px;
+    grid-template-rows: 50px;
+}
+
+a {
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    color: inherit;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    padding-top:30px;
+}
+
+a:hover {
+    background-color: #495057;
 }

@@ -74,7 +74,7 @@ public class EventController {
         Event event = new Event();
         model.addAttribute("event", event);
 
-        return "solo-event";
+        return "group-event";
     }
 
     @GetMapping("/saveEvent")
@@ -162,6 +162,7 @@ public class EventController {
         Event event = eventService.findEventById(eventId);
         if (event != null ) {
             model.addAttribute("eventId", eventId);
+            model.addAttribute("event",event);
             return "select-date-time";
         } else {
             return "invalid-link";
@@ -169,15 +170,34 @@ public class EventController {
     }
 
     @GetMapping("/event/schedule-meetings")
-    public String scheduleMeeting(@RequestParam("selectedDate") String selectDate,
-                                  @RequestParam("selectedTime") String selectTime,
+    public String scheduleMeeting(@RequestParam("eventId") int eventId,
+                                  @RequestParam("selectedTime") String selectedTime,
+                                  @RequestParam("year") int year,
+                                  @RequestParam("month") String month,
+                                  @RequestParam("day") int day,
                                   Model model) {
-        model.addAttribute("selectedDate", selectDate);
-        model.addAttribute("selectedTime", selectTime);
+        String meetingLink = "";
+        String phonenumber = "";
+        Event event = eventService.findEventById(eventId);
+        System.out.println(month);
+        System.out.println(day);
+        System.out.println(year);
+        System.out.println(selectedTime);
 
-        String meetingLink = "https://nextjs-zegocloud-uikits-sooty-three.vercel.app/";
+        if (event.getPlatform().equals("phone-call")) {
+            phonenumber = "+91 9014512348";
+        } else {
+            meetingLink = "https://nextjs-zegocloud-uikits-sooty-three.vercel.app/";
+        }
+
         model.addAttribute("meetingLink", meetingLink);
+        model.addAttribute("phonenumber", phonenumber);
+        model.addAttribute("year", year);
+        model.addAttribute("month", month);
+        model.addAttribute("day", day);
+        model.addAttribute("selectedTime",selectedTime);
 
         return "meeting-details";
     }
+
 }
