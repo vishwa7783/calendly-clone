@@ -1,6 +1,5 @@
 package com.io.mountblue.calendlyclone.service;
 
-import biweekly.property.Attendee;
 import com.io.mountblue.calendlyclone.dto.CalenderDto;
 import com.io.mountblue.calendlyclone.entity.Event;
 

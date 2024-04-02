@@ -7,7 +7,6 @@ import com.io.mountblue.calendlyclone.dto.CalenderDto;
 import com.io.mountblue.calendlyclone.service.MeetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 
@@ -48,6 +47,7 @@ public class EmailController {
         CalenderDto calenderDto = new CalenderDto();
         model.addAttribute("eventId", eventId);
         model.addAttribute("calenderDto", calenderDto);
+
         if(event.getEventType().equals("solo")) {
             return "calendar-invite";
         }else{
@@ -61,7 +61,6 @@ public class EmailController {
                                @RequestParam("name") String name,
                                @PathVariable("eventId") int eventId, Model model) throws MessagingException, IOException {
         Event event = eventService.findEventById(eventId);
-
         List<Attendee> attendees = new ArrayList<>();
         Attendee attendee = new Attendee(name, email);
         attendees.add(attendee);

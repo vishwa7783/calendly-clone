@@ -6,7 +6,6 @@ import com.io.mountblue.calendlyclone.dto.CalenderDto;
 import com.io.mountblue.calendlyclone.entity.Event;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.task.DelegatingSecurityContextAsyncTaskExecutor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
