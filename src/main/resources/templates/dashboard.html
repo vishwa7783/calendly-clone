@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -10,7 +11,7 @@
 <div class="navbar">
 
     <div id="box"></div>
-    <div class="inbox">
+    <div class="inbox" sec:authorize="!isAuthenticated()">
         <a href="/login"><button class="button" >Sign In</button></a>
         <a href="/registerForm"><button class="button" >Sign Up</button></a>
     </div>
