@@ -25,6 +25,29 @@
            font-size: 14px;
            width: 150px;
        }
+       .calendar-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-box {
+            border: 1px solid #ccc;
+            width: 100px;
+            text-align: center;
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        .calendar-box.active {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .availability-end-time{
+            padding-left:20px;
+        }
+
     </style>
 </head>
 <body>
@@ -32,55 +55,181 @@
     <div class="row">
         <div class="col-md-6">
             <h2 class="text-center mb-4">Schedule the Meet</h2>
-            <form action="/event/schedule-meetings" method="get">
-                <div class="calendar-container">
-                    <input type="date" name="selectedDate"  th:value="${selectedDate}" id="calendar" class="form-control mb-4">
-                </div>
-                <div class="time-container">
-                    <label for="time" class="form-label" >Select Time:</label>
-                    <select id="time" name="selectedTime" class="form-select mb-4" th:value="${selectedTime}">
-                        <option value="09:00">9:00  am</option>
-                        <option value="09:30">9:30  am</option>
-                        <option value="10:00">10:00 am</option>
-                        <option value="10:30">10:30 am</option>
-                        <option value="10:30">11:00 am</option>
-                        <option value="10:30">11:30 am</option>
-                        <option value="10:30">12:00 am</option>
-                        <option value="10:30">12:30 pm</option>
-                        <option value="10:30">01:00 pm</option>
-                        <option value="10:30">01:30 pm</option>
-                        <option value="10:30">02:00 pm</option>
-                        <option value="10:30">02:30 pm</option>
-                        <option value="10:30">03:00 pm</option>
-                        <option value="10:30">03:30 pm</option>
-                        <option value="10:30">04:00 pm</option>
-                    </select>
-                    <input type="hidden" name="eventId" th:value="${eventId}">
-                    <button type="submit" class="btn btn-primary">Schedule Event</button>
-                </div>
-            </form>
 
-            <label class="label-availability" >Availability of Host:</label>
+            <div class="calendar-container">
+                <button id="prevYearButton" class="btn btn-secondary">&lt;</button>
+                <div id="yearContainer" class="d-flex align-items-center"></div>
+                <button id="nextYearButton" class="btn btn-secondary">&gt;</button>
+            </div>
+
+            <div class="calendar-container">
+                <button id="prevMonthButton" class="btn btn-secondary">&lt;</button>
+                <div id="monthContainer" class="d-flex align-items-center"></div>
+                <button id="nextMonthButton" class="btn btn-secondary">&gt;</button>
+            </div>
+
+            <div class="calendar-container">
+                <button id="prevDatesButton" class="btn btn-secondary">&lt;</button>
+                <div id="calendarContainer" class="calendar-container"></div>
+                <button id="nextDatesButton" class="btn btn-secondary">&gt;</button>
+            </div>
+
+            <div class="time-container">
+                <label for="time" class="form-label" >Select Time:</label>
+                <select id="time" name="selectedTime" class="form-select mb-4" th:value="${selectedTime}">
+                    <option value="09:00">9:00  am</option>
+                    <option value="09:30">9:30  am</option>
+                    <option value="10:00">10:00 am</option>
+                    <option value="10:30">10:30 am</option>
+                    <option value="10:30">11:00 am</option>
+                    <option value="10:30">11:30 am</option>
+                    <option value="10:30">12:00 am</option>
+                    <option value="10:30">12:30 pm</option>
+                    <option value="10:30">01:00 pm</option>
+                    <option value="10:30">01:30 pm</option>
+                    <option value="10:30">02:00 pm</option>
+                    <option value="10:30">02:30 pm</option>
+                    <option value="10:30">03:00 pm</option>
+                    <option value="10:30">03:30 pm</option>
+                    <option value="10:30">04:00 pm</option>
+                </select>
+                <input type="hidden" name="eventId" th:value="${eventId}">
+            </div>
+
+            <label class="label-availability">Availability of Host:</label><br>
             <div class="availability-options" th:object="${event}">
                 <div class="availability-option" th:each="availability, dayIndex : ${event.availableHoursByDays}">
                     <div th:if="${availability.event.id} == ${event.id}">
-                        <input type="hidden" th:field="*{availableHoursByDays[__${dayIndex.index}__].day}" th:value="${availability.day}" />
                         <label th:text="${availability.day}" class="availability-label"></label><br>
-                        <label>
-                            <select th:id="'start-time-' + ${dayIndex}" th:field="*{availableHoursByDays[__${dayIndex.index}__].startTime}" class="availability-start-time">
-                                <option th:each="startTime : ${availability.startTime}" th:value="${startTime}" th:text="${startTime}"></option>
-                            </select>
-                        </label>
-                        <label>
-                            <select th:id="'end-time-' + ${dayIndex}" th:field="*{availableHoursByDays[__${dayIndex.index}__].endTime}" class="availability-end-time">
-                                <option th:each="endTime : ${availability.endTime}" th:value="${endTime}" th:text="${endTime}"></option>
-                            </select>
-                        </label>
-                    </div>
+                        <span th:text="${availability.startTime}" class="availability-start-time"></span>
+                        <span th:text="${availability.endTime}" class="availability-end-time"></span>
+                    </div><br>
                 </div>
             </div>
         </div>
     </div>
+    <button id="scheduleEventButton" class="btn btn-primary">Schedule Event</button><br>
 </div>
+
+<script>
+
+    const yearContainer = document.getElementById('yearContainer');
+    const prevYearButton = document.getElementById('prevYearButton');
+    const nextYearButton = document.getElementById('nextYearButton');
+    let currentDate = new Date();
+
+    function updateYear() {
+        yearContainer.textContent = currentDate.getFullYear();
+    }
+
+    prevYearButton.addEventListener('click', () => {
+        currentDate.setFullYear(currentDate.getFullYear() - 1);
+        updateYear();
+        updateCalendar();
+    });
+
+    nextYearButton.addEventListener('click', () => {
+        currentDate.setFullYear(currentDate.getFullYear() + 1);
+        updateYear();
+        updateCalendar();
+    });
+
+    updateYear();
+
+    const monthContainer = document.getElementById('monthContainer');
+    const prevMonthButton = document.getElementById('prevMonthButton');
+    const nextMonthButton = document.getElementById('nextMonthButton');
+
+    function updateMonth() {
+        const options = { month: 'long' };
+        monthContainer.textContent = currentDate.toLocaleDateString('en-US', options);
+    }
+
+    prevMonthButton.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        updateMonth();
+        updateCalendar();
+    });
+
+    nextMonthButton.addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        updateMonth();
+        updateCalendar();
+    });
+
+    updateMonth();
+
+    const calendarContainer = document.getElementById('calendarContainer');
+    const prevDatesButton = document.getElementById('prevDatesButton');
+    const nextDatesButton = document.getElementById('nextDatesButton');
+    let startDay = 1;
+    let endDay = 5;
+    let selectedDate = null;
+
+    function updateCalendar() {
+        calendarContainer.innerHTML = '';
+
+        const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+        const daysInMonth = lastDayOfMonth.getDate();
+
+        for (let day = startDay; day <= endDay; day++) {
+            if (day > daysInMonth) break;
+            const dayBox = document.createElement('div');
+            dayBox.classList.add('calendar-box');
+            const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+            dayBox.textContent = date.toLocaleDateString('en-US', { weekday: 'short' }) + '\n' + date.getDate();
+            dayBox.addEventListener('click', () => {
+                selectedDate = date;
+                dayBox.classList.toggle('active');
+            });
+            calendarContainer.appendChild(dayBox);
+        }
+    }
+
+    updateCalendar();
+
+    prevDatesButton.addEventListener('click', () => {
+        if (startDay > 1) {
+            startDay -= 5;
+            endDay -= 5;
+            updateCalendar();
+        }
+    });
+
+    nextDatesButton.addEventListener('click', () => {
+        const lastDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+        const daysInMonth = lastDayOfMonth.getDate();
+        if (endDay < daysInMonth) {
+            startDay += 5;
+            endDay += 5;
+            updateCalendar();
+        }
+    });
+
+    const scheduleEventButton = document.getElementById('scheduleEventButton');
+    scheduleEventButton.addEventListener('click', () => {
+        if (selectedDate) {
+            const year = selectedDate.getFullYear();
+            const month = selectedDate.toLocaleString('default', { month: 'long' });
+            const day = selectedDate.getDate();
+            const eventId = document.querySelector('input[name="eventId"]').value; // Get eventId from hidden input
+            const selectedTime = document.getElementById('time').value; // Get selectedTime from dropdown
+            // Assuming you are using AJAX to send data to the controller method
+            fetch(`/event/schedule-meetings?eventId=${eventId}&selectedTime=${selectedTime}&year=${year}&month=${month}&day=${day}`)
+                .then(response => {
+                    // Handle response here
+                    console.log('Meeting scheduled successfully');
+                    window.location.href = response.url; // Redirect to meeting-details page
+                })
+                .catch(error => {
+                    // Handle error here
+                    console.error('Error scheduling meeting:', error);
+                });
+        } else {
+            console.log('Please select a date before scheduling the meeting');
+        }
+    });
+</script>
 </body>
 </html>

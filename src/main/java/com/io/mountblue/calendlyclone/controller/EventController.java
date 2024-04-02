@@ -12,12 +12,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalTime;
 import java.util.*;
@@ -27,6 +26,7 @@ import java.util.*;
 public class EventController {
     @Value("${server.port}")
     private int serverPort;
+
     EventService eventService;
     UserService userService;
     AvailabilityService availabilityService;
@@ -107,6 +107,7 @@ public class EventController {
             availability.setEvent(theEvent);
             availabilityService.save(availability);
         }
+
         String eventnewlink = "http://localhost:" + serverPort + "/event/" + theEvent.getId() + "/select-date-time?eventId=" + meetingId;
         event.setEventLink(eventnewlink);
         eventService.save(event);
@@ -183,15 +184,29 @@ public class EventController {
     }
 
     @GetMapping("/event/schedule-meetings")
-    public String scheduleMeeting(@RequestParam("selectedDate") String selectDate,
-                                  @RequestParam("selectedTime") String selectTime,
+    public String scheduleMeeting(@RequestParam("eventId") int eventId,
+                                  @RequestParam("selectedTime") String selectedTime,
+                                  @RequestParam("year") int year,
+                                  @RequestParam("month") String month,
+                                  @RequestParam("day") int day,
                                   Model model) {
-        model.addAttribute("selectedDate", selectDate);
-        model.addAttribute("selectedTime", selectTime);
-        String meetingLink = "https://nextjs-zegocloud-uikits-sooty-three.vercel.app/";
+        String meetingLink = "";
+        String phonenumber = "";
+        Event event = eventService.findEventById(eventId);
+
+        if (event.getPlatform().equals("phone-call")) {
+            phonenumber = "+91 9014512348";
+        } else {
+            meetingLink = "https://nextjs-zegocloud-uikits-sooty-three.vercel.app/";
+        }
+
         model.addAttribute("meetingLink", meetingLink);
+        model.addAttribute("phonenumber", phonenumber);
+        model.addAttribute("year", year);
+        model.addAttribute("month", month);
+        model.addAttribute("day", day);
+        model.addAttribute("selectedTime",selectedTime);
 
         return "meeting-details";
     }
-
 }

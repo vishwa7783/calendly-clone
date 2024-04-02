@@ -40,12 +40,14 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
+            background-color: #0056b3;
+            color:white;
         }
     </style>
 
 </head>
 <body>
-<h2>Send Calendar</h2>
+<h2>Send Invitation</h2>
 <form th:action="@{'/send/'+${eventId}}" th:object="${calenderDto}" method="post">
     <div th:if="${isOneAttendee == false}">
         <p style="color:red"> Enter only one attendee information</P>
@@ -69,7 +71,7 @@
     </div>
 
     <div>
-        <button type="submit">Send Calendar</button>
+        <button type="submit">Send</button>
     </div>
 </form>
 </body>
