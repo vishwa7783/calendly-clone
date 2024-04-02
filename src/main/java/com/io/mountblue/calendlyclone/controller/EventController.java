@@ -7,6 +7,7 @@ import com.io.mountblue.calendlyclone.service.EventService;
 import com.io.mountblue.calendlyclone.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -24,7 +25,8 @@ import java.util.*;
 
 @Controller
 public class EventController {
-
+    @Value("${server.port}")
+    private int serverPort;
     EventService eventService;
     UserService userService;
     AvailabilityService availabilityService;
@@ -52,16 +54,17 @@ public class EventController {
     }
 
     @GetMapping("event_types/solo")
-    public String eventTypeSolo(Model model, @AuthenticationPrincipal UserDetails userDetails){
+    public String eventTypeSolo(Model model){
         Event event = new Event();
         String[] days={"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
         List<Availability> availabilities = new ArrayList<>();
         for (String day : days) {
             availabilities.add(new Availability(day, LocalTime.parse("00:00"), LocalTime.parse("00:00")));
         }
-
+        event.setEventType("solo");
         event.setAvailableHoursByDays(availabilities);
         model.addAttribute("event", event);
+        model.addAttribute("type", "solo");
         model.addAttribute("daysOfWeek", Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"));
 
         return "solo-event";
@@ -70,20 +73,31 @@ public class EventController {
     @GetMapping("event_types/group")
     public String eventTypeGroup(Model model){
         Event event = new Event();
+        String[] days={"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+        List<Availability> availabilities = new ArrayList<>();
+        for (String day : days) {
+            availabilities.add(new Availability(day, LocalTime.parse("00:00"), LocalTime.parse("00:00")));
+        }
+        event.setEventType("group");
+        event.setAvailableHoursByDays(availabilities);
         model.addAttribute("event", event);
+        model.addAttribute("type", "group");
+        model.addAttribute("daysOfWeek", Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"));
 
         return "group-event";
     }
 
     @GetMapping("/saveEvent")
-    public String saveEvent(@AuthenticationPrincipal UserDetails userDetails, @ModelAttribute("event") Event event, Model model)
+    public String saveEvent(@AuthenticationPrincipal UserDetails userDetails,
+                            @ModelAttribute("event") Event event,
+                            @RequestParam("type") String eventType, Model model)
     {
         String meetingId = UUID.randomUUID().toString();
         User host = userService.findUserByEmail(userDetails.getUsername());
         String eventLink = "https://calendly.com/"+host.getName()+"/"+event.getDuration()+"/"+meetingId;
         event.setEventLink(eventLink);
         event.setHost(host);
-
+        event.setEventType(eventType);
         for (Availability availability : event.getAvailableHoursByDays()) {
             availability.setHost(host);
         }
@@ -93,7 +107,7 @@ public class EventController {
             availability.setEvent(theEvent);
             availabilityService.save(availability);
         }
-        String eventnewlink = "http://localhost:8090/event/" + theEvent.getId() + "/select-date-time?eventId=" + meetingId;
+        String eventnewlink = "http://localhost:" + serverPort + "/event/" + theEvent.getId() + "/select-date-time?eventId=" + meetingId;
         event.setEventLink(eventnewlink);
         eventService.save(event);
         model.addAttribute("event",theEvent);
@@ -126,7 +140,7 @@ public class EventController {
             model.addAttribute("events",events);
         }
         eventService.deleteEventById(eventId);
-
+        availabilityService.deleteAvailabilityByEventId(eventId);
         return "redirect:/scheduled_events";
     }
 
@@ -157,10 +171,11 @@ public class EventController {
     }
 
     @GetMapping("/event/{eventId}/select-date-time")
-    public String selectDateTime(@PathVariable("eventId") int eventId, @RequestParam("eventId") String uniqueIdentifier, Model model){
+    public String selectDateTime(@PathVariable("eventId") int eventId, Model model){
         Event event = eventService.findEventById(eventId);
         if (event != null ) {
             model.addAttribute("eventId", eventId);
+            model.addAttribute("event", event);
             return "select-date-time";
         } else {
             return "invalid-link";
@@ -168,18 +183,15 @@ public class EventController {
     }
 
     @GetMapping("/event/schedule-meetings")
-    public String scheduleMeeting(@RequestParam("eventId") int eventId,
-                                  @RequestParam("selectedDate") String selectDate,
+    public String scheduleMeeting(@RequestParam("selectedDate") String selectDate,
                                   @RequestParam("selectedTime") String selectTime,
                                   Model model) {
         model.addAttribute("selectedDate", selectDate);
         model.addAttribute("selectedTime", selectTime);
-        System.out.println(eventId);
-        System.out.println(selectDate);
-        System.out.println(selectTime);
-        String meetingLink = "https://your-meeting-link.com/" + eventId;
+        String meetingLink = "https://nextjs-zegocloud-uikits-sooty-three.vercel.app/";
         model.addAttribute("meetingLink", meetingLink);
 
         return "meeting-details";
     }
+
 }

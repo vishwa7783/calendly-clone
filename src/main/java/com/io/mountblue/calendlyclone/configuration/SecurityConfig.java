@@ -19,7 +19,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(configurer ->
                         configurer
-                                .requestMatchers("/", "/saveUser", "/registerForm").permitAll()
+                                .requestMatchers("/dashboard", "/saveUser", "/registerForm","/event/{eventId}/select-date-time***").permitAll()
                                 .anyRequest().authenticated()
                 ).formLogin(form ->
                         form

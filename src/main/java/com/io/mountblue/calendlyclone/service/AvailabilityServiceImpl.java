@@ -25,4 +25,9 @@ public class AvailabilityServiceImpl implements AvailabilityService{
     public List<Availability> findAvailabiltyByUserId(int id) {
         return availabilityRepository.findAllByHostId(id);
     }
+
+    @Override
+    public void deleteAvailabilityByEventId(int eventId) {
+        availabilityRepository.deleteByEventId(eventId);
+    }
 }

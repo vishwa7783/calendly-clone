@@ -5,6 +5,26 @@
     <title>Select Date and Time</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        label.form-label {
+           font-weight: bold;
+           font-size: 18px;
+       }
+       .availability-option {
+           margin-bottom: 20px;
+       }
+       .label-availability{
+           margin-top:20px;
+       }
+       availability-label {
+           font-weight: bold;
+       }
+       .availability-option select {
+           padding: 5px;
+           border: 1px solid #ccc;
+           border-radius: 5px;
+           font-size: 14px;
+           width: 150px;
+       }
     </style>
 </head>
 <body>
@@ -39,6 +59,26 @@
                     <button type="submit" class="btn btn-primary">Schedule Event</button>
                 </div>
             </form>
+
+            <label class="label-availability" >Availability of Host:</label>
+            <div class="availability-options" th:object="${event}">
+                <div class="availability-option" th:each="availability, dayIndex : ${event.availableHoursByDays}">
+                    <div th:if="${availability.event.id} == ${event.id}">
+                        <input type="hidden" th:field="*{availableHoursByDays[__${dayIndex.index}__].day}" th:value="${availability.day}" />
+                        <label th:text="${availability.day}" class="availability-label"></label><br>
+                        <label>
+                            <select th:id="'start-time-' + ${dayIndex}" th:field="*{availableHoursByDays[__${dayIndex.index}__].startTime}" class="availability-start-time">
+                                <option th:each="startTime : ${availability.startTime}" th:value="${startTime}" th:text="${startTime}"></option>
+                            </select>
+                        </label>
+                        <label>
+                            <select th:id="'end-time-' + ${dayIndex}" th:field="*{availableHoursByDays[__${dayIndex.index}__].endTime}" class="availability-end-time">
+                                <option th:each="endTime : ${availability.endTime}" th:value="${endTime}" th:text="${endTime}"></option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
