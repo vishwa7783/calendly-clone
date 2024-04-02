@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface AvailabilityRepository extends JpaRepository<Availability, Integer> {
     List<Availability> findAllByHostId(int id);
+
+    void deleteByEventId(int id);
 }

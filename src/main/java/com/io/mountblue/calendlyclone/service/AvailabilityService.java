@@ -8,4 +8,6 @@ public interface AvailabilityService {
     void save(Availability availability);
 
     List<Availability> findAvailabiltyByUserId(int id);
+
+    void deleteAvailabilityByEventId(int id);
 }

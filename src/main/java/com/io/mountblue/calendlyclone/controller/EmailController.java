@@ -7,6 +7,7 @@ import com.io.mountblue.calendlyclone.dto.CalenderDto;
 import com.io.mountblue.calendlyclone.service.MeetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 
@@ -43,27 +44,56 @@ public class EmailController {
 
     @GetMapping("/calDtoDetails/{eventId}")
     public String calDetails(Model model, @PathVariable("eventId") int eventId){
+        Event event = eventService.findEventById(eventId);
         CalenderDto calenderDto = new CalenderDto();
         model.addAttribute("eventId", eventId);
         model.addAttribute("calenderDto", calenderDto);
-
-        return "calendar-invite";
+        if(event.getEventType().equals("solo")) {
+            return "calendar-invite";
+        }else{
+            return "calender-invite-group";
+        }
     }
 
     @PostMapping("/send/{eventId}")
     public String sendCalendar(@ModelAttribute CalenderDto calenderDto,
                                @RequestParam("email") String email,
                                @RequestParam("name") String name,
-                               @PathVariable("eventId") int eventId) throws MessagingException, IOException {
+                               @PathVariable("eventId") int eventId, Model model) throws MessagingException, IOException {
         Event event = eventService.findEventById(eventId);
+
         List<Attendee> attendees = new ArrayList<>();
         Attendee attendee = new Attendee(name, email);
         attendees.add(attendee);
+        Boolean isOneAttendee = eventService.checkNumberofMailsAndNames(name, email);
+
+        if(!isOneAttendee){
+            model.addAttribute("isOneAttendee", isOneAttendee);
+            model.addAttribute("eventId", eventId);
+            model.addAttribute("calenderDto", calenderDto);
+            return "calendar-invite";
+        }
 
         meetService.saveMeet(name, email, event, calenderDto);
         calenderDto.setAttendees(attendees);
         emailService.sendCalenderInvite(calenderDto, event);
+
         return "redirect:/dashboard";
+    }
+
+    @PostMapping("/send/group/{eventId}")
+    public String sendGroupEvent(@ModelAttribute CalenderDto calenderDto,
+                                 @RequestParam("emails") String mails,
+                                 @RequestParam("names") String names,
+                                 @PathVariable("eventId") int eventId) throws MessagingException, IOException {
+        Event event = eventService.findEventById(eventId);
+        if(eventService.setAttendees(names, mails, calenderDto)){
+        emailService.sendCalenderInvite(calenderDto, event);
+
+        return "calender-invite-group";
+        }else{
+            return "access-denied";
+        }
     }
 }
 

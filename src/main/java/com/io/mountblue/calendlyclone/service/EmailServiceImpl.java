@@ -21,10 +21,11 @@ import jakarta.mail.util.ByteArrayDataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -43,6 +44,7 @@ public class EmailServiceImpl implements EmailService{
     @Override
     public void sendEmail(String sender,String recipients,String subject,Event event) {
         String emailContent = getEmailContent(event);
+
     }
 
     @Override
@@ -117,7 +119,6 @@ public class EmailServiceImpl implements EmailService{
     public String getEmailContent(Event event) {
         Context thymeleafContext = new Context();
         thymeleafContext.setVariable("event", event);
-
         StringWriter stringWriter = new StringWriter();
         templateEngine.process("event-details", thymeleafContext, stringWriter);
         String emailContent = stringWriter.toString();

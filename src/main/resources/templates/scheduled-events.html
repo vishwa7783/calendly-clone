@@ -36,6 +36,7 @@
         <th>ID</th>
         <th>Title</th>
         <th>Host</th>
+        <th>Type</th>
         <th>Description</th>
         <th>Duration</th>
         <th>Platform</th>
@@ -47,21 +48,25 @@
         <td><span  th:text="${event.id}"></span></td>
         <td><span th:text="${event.title}"></span></td>
         <td><span th:text="${event.host.name}"></span></td>
+        <td><span th:text="${event.eventType}"></span></td>
         <td><span th:text="${event.description}"></span></td>
         <td><span th:text="${event.duration}"></span></td>
         <td><span th:text="${event.platform}"></span></td>
         <td>
-            <form th:action="@{'/event/'+${event.id}}" method="get">
+            <span><form th:action="@{'/event/'+${event.id}}" method="get">
                 <input type="submit" value="See All Details">
             </form>
             <form th:action="@{'/calDtoDetails/'+${event.id}}" ><input type="submit" value="send"></form>
             <form th:action="@{'/event/delete/'+${event.id}}" method="post">
                 <input type="submit" value="Delete">
-            </form>
+            </form></span>
+            <span>
             <form th:action="@{'/event/update/'+${event.id}}" method="get">
                 <input type="submit" value="Update">
             </form>
+            </span>
         </td>
+
     </tr>
     </tbody>
 </table>

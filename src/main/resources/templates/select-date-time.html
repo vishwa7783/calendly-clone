@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Date and Time</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        label.form-label {
+           font-weight: bold;
+           font-size: 18px;
+       }
+       .availability-option {
+           margin-bottom: 20px;
+       }
+       .label-availability{
+           margin-top:20px;
+       }
+       availability-label {
+           font-weight: bold;
+       }
+       .availability-option select {
+           padding: 5px;
+           border: 1px solid #ccc;
+           border-radius: 5px;
+           font-size: 14px;
+           width: 150px;
+       }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6">
+            <h2 class="text-center mb-4">Schedule the Meet</h2>
+            <form action="/event/schedule-meetings" method="get">
+                <div class="calendar-container">
+                    <input type="date" name="selectedDate"  th:value="${selectedDate}" id="calendar" class="form-control mb-4">
+                </div>
+                <div class="time-container">
+                    <label for="time" class="form-label" >Select Time:</label>
+                    <select id="time" name="selectedTime" class="form-select mb-4" th:value="${selectedTime}">
+                        <option value="09:00">9:00  am</option>
+                        <option value="09:30">9:30  am</option>
+                        <option value="10:00">10:00 am</option>
+                        <option value="10:30">10:30 am</option>
+                        <option value="10:30">11:00 am</option>
+                        <option value="10:30">11:30 am</option>
+                        <option value="10:30">12:00 am</option>
+                        <option value="10:30">12:30 pm</option>
+                        <option value="10:30">01:00 pm</option>
+                        <option value="10:30">01:30 pm</option>
+                        <option value="10:30">02:00 pm</option>
+                        <option value="10:30">02:30 pm</option>
+                        <option value="10:30">03:00 pm</option>
+                        <option value="10:30">03:30 pm</option>
+                        <option value="10:30">04:00 pm</option>
+                    </select>
+                    <input type="hidden" name="eventId" th:value="${eventId}">
+                    <button type="submit" class="btn btn-primary">Schedule Event</button>
+                </div>
+            </form>
+
+            <label class="label-availability" >Availability of Host:</label>
+            <div class="availability-options" th:object="${event}">
+                <div class="availability-option" th:each="availability, dayIndex : ${event.availableHoursByDays}">
+                    <div th:if="${availability.event.id} == ${event.id}">
+                        <input type="hidden" th:field="*{availableHoursByDays[__${dayIndex.index}__].day}" th:value="${availability.day}" />
+                        <label th:text="${availability.day}" class="availability-label"></label><br>
+                        <label>
+                            <select th:id="'start-time-' + ${dayIndex}" th:field="*{availableHoursByDays[__${dayIndex.index}__].startTime}" class="availability-start-time">
+                                <option th:each="startTime : ${availability.startTime}" th:value="${startTime}" th:text="${startTime}"></option>
+                            </select>
+                        </label>
+                        <label>
+                            <select th:id="'end-time-' + ${dayIndex}" th:field="*{availableHoursByDays[__${dayIndex.index}__].endTime}" class="availability-end-time">
+                                <option th:each="endTime : ${availability.endTime}" th:value="${endTime}" th:text="${endTime}"></option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

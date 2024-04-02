@@ -33,6 +33,9 @@ public class Event {
     @Column(name = "date_range")
     private int dateRange;
 
+    @Column(name="event_type")
+    private String eventType;
+
     @Column(name = "event_link", unique = true)
     private  String eventLink;
 
@@ -117,6 +120,14 @@ public class Event {
 
     public void setEventLink(String eventLink) {
         this.eventLink = eventLink;
+    }
+
+    public String getEventType() {
+        return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
     }
 
     public List<Availability> getAvailableHoursByDays() {

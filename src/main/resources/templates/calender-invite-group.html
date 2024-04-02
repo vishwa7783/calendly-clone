@@ -46,10 +46,7 @@
 </head>
 <body>
 <h2>Send Calendar</h2>
-<form th:action="@{'/send/'+${eventId}}" th:object="${calenderDto}" method="post">
-    <div th:if="${isOneAttendee == false}">
-        <p style="color:red"> Enter only one attendee information</P>
-    </div>
+<form th:action="@{'/send/group/'+${eventId}}" th:object="${calenderDto}" method="post">
     <div>
         <label for="subject">Subject:</label>
         <input type="text" id="subject" th:field="*{subject}" required>
@@ -60,16 +57,15 @@
         <input type="datetime-local" id="eventDateTime" th:field="*{eventDateTime}" required>
     </div>
     <div>
-        <label for="attendee-name">Attendee Name:</label>
-        <input type="text" id="attendee-name" name="name" th:value="${name}" required>
+        <label for="attendee-name">Attendee(s) Name:</label>
+        <input type="text" id="attendee-name" name="names" th:value="${name}" placeholder="Enter Name(s) Comma Separated" required>
     </div>
     <div>
         <label for="attendee-mail">Attendees Email:</label>
-        <input type="text" id="attendee-mail" name="email" th:value="${email}" required>
+        <input type="text" id="attendee-mail" name="emails" th:value="${email}" placeholder="Enter Email(s) Comma Separated" required>
     </div>
-
     <div>
-        <button type="submit">Send Calendar</button>
+        <button type="submit">Send </button>
     </div>
 </form>
 </body>
