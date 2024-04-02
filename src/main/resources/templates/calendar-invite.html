@@ -52,6 +52,9 @@
     <div th:if="${isOneAttendee == false}">
         <p style="color:red"> Enter only one attendee information</P>
     </div>
+    <div th:if="${successful}">
+        <p style="color:green"> Email successfully sent</P>
+    </div>
     <div>
         <label for="subject">Subject:</label>
         <input type="text" id="subject" th:field="*{subject}" required>

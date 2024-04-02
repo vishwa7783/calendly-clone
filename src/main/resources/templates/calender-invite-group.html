@@ -49,6 +49,9 @@
 <body>
 <h2>Send Invitation</h2>
 <form th:action="@{'/send/group/'+${eventId}}" th:object="${calenderDto}" method="post">
+    <div th:if="${successful}">
+        <p style="color:green"> Email successfully sent</P>
+    </div>
     <div>
         <label for="subject">Subject:</label>
         <input type="text" id="subject" th:field="*{subject}" required>
