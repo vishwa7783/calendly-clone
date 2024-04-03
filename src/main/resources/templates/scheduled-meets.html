@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" >
+    <title>My Meets</title>
+    <style>
+        table {
+              border-collapse: collapse;
+              width: 100%;
+              border: 2px solid #dddddd;
+          }
+
+          th, td {
+              border: 3px solid #dddddd;
+              text-align: left;
+              padding: 8px;
+          }
+
+          tr:nth-child(even) {
+              background-color: #f2f2f2;
+          }
+
+
+          body {
+              background-color: #f0f0f0;
+              margin: 0;
+              padding: 0;
+              font-family: Arial, sans-serif;
+          }
+
+          h1 {
+              padding:10px;
+              background-color: #333;
+              color: #fff;
+              margin: 0;
+          }
+         .back-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<h1>My Meets</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Invitee Name</th>
+        <th>Invitee Email</th>
+        <th>Start Time</th>
+        <th>End Time</th>
+        <th>Date</th>
+        <th>Description</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="meet : ${meets}">
+        <td th:text="${meet.inviteeName}"></td>
+        <td th:text="${meet.inviteeEmail}"></td>
+        <td th:text="${meet.startTime}"></td>
+        <td th:text="${meet.endTime}"></td>
+        <td th:text="${meet.date}"></td>
+        <td th:text="${meet.description}"></td>
+    </tr>
+    </tbody>
+</table>
+<a href="/dashboard" class="back-button">Back</a>
+</body>
+</html>
