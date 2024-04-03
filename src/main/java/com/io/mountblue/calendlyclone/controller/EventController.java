@@ -1,9 +1,11 @@
 package com.io.mountblue.calendlyclone.controller;
 import com.io.mountblue.calendlyclone.entity.Availability;
 import com.io.mountblue.calendlyclone.entity.Event;
+import com.io.mountblue.calendlyclone.entity.Meet;
 import com.io.mountblue.calendlyclone.entity.User;
 import com.io.mountblue.calendlyclone.service.AvailabilityService;
 import com.io.mountblue.calendlyclone.service.EventService;
+import com.io.mountblue.calendlyclone.service.MeetService;
 import com.io.mountblue.calendlyclone.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +33,14 @@ public class EventController {
     UserService userService;
     AvailabilityService availabilityService;
 
+    MeetService meetService;
+
     @Autowired
-    public EventController(EventService eventService, UserService userService, AvailabilityService availabilityService) {
+    public EventController(EventService eventService, UserService userService, AvailabilityService availabilityService, MeetService meetService) {
         this.eventService = eventService;
         this.userService = userService;
         this.availabilityService = availabilityService;
+        this.meetService = meetService;
     }
 
     @GetMapping("/event_types")
@@ -208,5 +213,13 @@ public class EventController {
         model.addAttribute("selectedTime",selectedTime);
 
         return "meeting-details";
+    }
+
+    @GetMapping("/my_meets")
+    public String getMeets(Model model, @AuthenticationPrincipal UserDetails userDetails){
+        User user = userService.findUserByEmail(userDetails.getUsername());
+        List<Meet> meets= meetService.findMeetsByHostId(user.getId());
+        model.addAttribute("meets",meets);
+        return "scheduled-meets";
     }
 }

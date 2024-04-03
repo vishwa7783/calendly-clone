@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -11,7 +10,7 @@
 <div class="navbar">
 
     <div id="box"></div>
-    <div class="inbox" sec:authorize="!isAuthenticated()">
+    <div class="inbox">
         <a href="/login"><button class="button" >Sign In</button></a>
         <a href="/registerForm"><button class="button" >Sign Up</button></a>
     </div>
@@ -20,8 +19,8 @@
     <div class="somebox">
         <div><a href="/event_types"><img src="/eventtypes.png" ></a><br></div>
         <div><a href="/scheduled_events"><img src="/scheduledevents.png" ></a></div>
+        <div><a href="/my_meets"><img src="/contacts.png" ></a></div>
     </div>
 </div>
 </body>
 </html>
-

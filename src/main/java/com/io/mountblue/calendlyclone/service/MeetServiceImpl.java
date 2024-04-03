@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class MeetServiceImpl implements MeetService {
@@ -34,5 +35,10 @@ public class MeetServiceImpl implements MeetService {
         meet.setEndTime(LocalTime.from(calenderDto.getEventDateTime().plusMinutes(event.getDuration())));
 
         meetRepository.save(meet);
+    }
+
+    @Override
+    public List<Meet> findMeetsByHostId(int id) {
+        return meetRepository.findByHostId(id);
     }
 }
