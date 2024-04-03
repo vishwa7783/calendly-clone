@@ -45,4 +45,9 @@ public class UserController {
         userService.save(theuser);
         return "redirect:/login";
     }
+
+    @PostMapping("/logout")
+    public String logout(){
+        return "dashboard";
+    }
 }

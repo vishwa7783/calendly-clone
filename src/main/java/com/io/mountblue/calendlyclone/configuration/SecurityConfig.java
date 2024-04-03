@@ -19,13 +19,13 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(configurer ->
                         configurer
-                                .requestMatchers("/dashboard", "/saveUser", "/registerForm","/event/{eventId}/select-date-time***").permitAll()
+                                .requestMatchers("/", "/saveUser", "/registerForm","/event/{eventId}/select-date-time***").permitAll()
                                 .anyRequest().authenticated()
                 ).formLogin(form ->
                         form
                                 .loginPage("/login")
                                 .loginProcessingUrl("/authenticateTheUser")
-                                .defaultSuccessUrl("/dashboard", true)
+                                .defaultSuccessUrl("/homepage", true)
                                 .permitAll()
                 )
                 .logout(logout -> logout.permitAll()

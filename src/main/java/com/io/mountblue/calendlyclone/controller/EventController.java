@@ -48,9 +48,13 @@ public class EventController {
         return "event-type";
     }
 
-    @GetMapping("/dashboard")
+    @GetMapping("/")
     public String showDashboard() {
         return "dashboard";
+    }
+ @GetMapping("/homepage")
+    public String showHomepage() {
+        return "homepage";
     }
 
     @GetMapping("/emailform")
@@ -222,4 +226,5 @@ public class EventController {
         model.addAttribute("meets",meets);
         return "scheduled-meets";
     }
+
 }

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Calendly Homepage</title>
+    <link rel="stylesheet" href="/homepage.css" type="text/css" >
+
+</head>
+<body class="body">
+<div class="navbar">
+
+    <div id="box"></div>
+    <div class="inbox">
+        <form th:action="@{/logout}" method="post"> <button value="Logout">Logout</button></form>
+    </div>
+</div><br><br>
+<div class="sidebar">
+    <div class="somebox">
+        <div><a href="/event_types"><img src="/eventtypes.png" ></a></div>
+        <div><a href="/scheduled_events"><img src="/scheduledevents.png" ></a></div>
+        <div><a href="/my_meets"><img src="/contacts.png" ></a></div>
+    </div>
+</div>
+</body>
+</html>
