@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import java.time.LocalTime;
 import java.util.*;
 
-
 @Controller
 public class EventController {
     @Value("${server.port}")
@@ -52,7 +51,7 @@ public class EventController {
     public String showDashboard() {
         return "dashboard";
     }
- @GetMapping("/homepage")
+    @GetMapping("/homepage")
     public String showHomepage() {
         return "homepage";
     }
@@ -122,7 +121,7 @@ public class EventController {
         eventService.save(event);
         model.addAttribute("event",theEvent);
 
-        return "event-details";
+        return "scheduled-events";
     }
 
     @GetMapping("/scheduled_events")
@@ -226,5 +225,4 @@ public class EventController {
         model.addAttribute("meets",meets);
         return "scheduled-meets";
     }
-
 }
