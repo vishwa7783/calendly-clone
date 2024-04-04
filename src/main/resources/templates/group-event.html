@@ -6,78 +6,87 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        .main{
-          padding: 20px;
-          font-family: Arial, sans-serif; /* Change font style */
+        .main {
+            padding: 20px;
+            font-family: Arial, sans-serif;
         }
-        header{
-          width: 300px;
+
+        header {
+            width: 300px;
         }
-        .event-form{
-          display: flex;
-          flex-direction: column;
-          align-items: left;
-          justify-content: left;
-          width: 300px;
+
+        .event-form {
+            display: flex;
+            flex-direction: column;
+            align-items: left;
+            justify-content: left;
+            width: 300px;
         }
+
         .form-label {
-          display: block;
-          margin-bottom: 5px;
-          font-size: 16px;
-          color: #333;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+            color: #333;
         }
+
         .form-input, .form-select {
-          width: 100%;
-          padding: 8px;
-          margin-bottom: 10px;
-          box-sizing: border-box;
-          font-size: 16px;
-          border: 2px solid black; /* Increase border thickness */
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            font-size: 16px;
+            border: 2px solid black;
         }
+
         .location-options {
-          margin-bottom: 10px;
+            margin-bottom: 10px;
         }
+
         .location-option {
-          margin-bottom: 5px;
+            margin-bottom: 5px;
         }
+
         .location-label {
-          margin-left: 5px;
+            margin-left: 5px;
         }
+
         .submit-button {
-          padding: 10px 20px;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          border: 2px solid black;
-          font-size: 16px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 2px solid black;
+            font-size: 16px;
+            margin-top:30px;
         }
-        .availability-option{
-          display: grid;
-          grid-template-columns: 120px 120px;
-          column-gap: 18px;
+
+        .availability-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
         }
-        .availability-label{
-          padding-top: 10px;
+
+        .availability-label {
+            margin-right: 10px;
+            margin-left: 10px;
+            width:50px;
         }
-        .calendar {
-          border-collapse: collapse;
+
+        .availability-start-time,
+        .availability-end-time {
+            width: 120px;
+            margin-right: 10px;
+            margin-left:20px;
         }
-        .calendar th, .calendar td {
-          border: 2px solid black; /* Increase border thickness */
-          padding: 10px;
-          text-align: center;
-        }
-        .date {
-          text-decoration: none;
-          color: black;
-        }
-        .date:hover {
-          color: blue;
-        }
+
         .box-2 {
-          position: absolute;
-          top: 80px;
-          left: 600px;
+            position: absolute;
+            top: 80px;
+            left: 600px;
+        }
+        .availability-checkbox{
+          border:2px solid black;
         }
     </style>
 </head>
@@ -104,16 +113,19 @@
         <label class="form-label">Location:</label>
         <div class="location-options">
             <div class="location-option">
-                <input type="radio" id="location-1" th:field="*{platform}" th:value="zoom" class="form-check-input" required>
+                <input type="radio" id="location-1" th:field="*{platform}" th:value="zoom"
+                       class="form-check-input" required>
                 <label for="location-1" class="form-check-label location-label"><i class="fas fa-video"></i> Zoom</label>
             </div>
             <div class="location-option">
-                <input type="radio" id="location-2" th:field="*{platform}" th:value="phone-call" class="form-check-input" required>
+                <input type="radio" id="location-2" th:field="*{platform}" th:value="phone-call"
+                       class="form-check-input" required>
                 <label for="location-2" class="form-check-label location-label"><i class="fas fa-phone"></i> Phone call</label>
             </div>
             <div class="location-option">
-                <input type="radio" id="location-3" th:field="*{platform}" th:value="google-meet" class="form-check-input" required>
-                <label for="location-3" class="form-check-label location-label"><i class="fas fa-users"></i> Google meeting</label>
+                <input type="radio" id="location-3" th:field="*{platform}" th:value="google-meet"
+                       class="form-check-input" required>
+                <label for="location-3" class="form-check-label location-label"><i class="fas fa-users"></i>Google Meeting</label>
             </div>
         </div><br>
 
@@ -122,37 +134,38 @@
         <div class="box-2">
             <label class="form-label">Availability:</label>
             <div class="availability-options">
-                <div class="availability-option" th:each="availability, dayIndex : ${event.availableHoursByDays}">
-                    <input type="hidden" th:field="*{availableHoursByDays[__${dayIndex.index}__].day}" th:value="${availability.day}" />
-                    <label th:text="${availability.day}" class="availability-label"></label><br>
-                    <select th:id="'start-time-' + ${dayIndex}" th:field="*{availableHoursByDays[__${dayIndex.index}__].startTime}" class="availability-start-time form-select form-control">
+                <div class="availability-option" th:each="day : ${daysOfWeek}">
+                    <input type="checkbox" id="availability-day-${day}" name="checkedDays" th:value="${day}"
+                           class="availability-checkbox form-check-input">
+                    <label for="availability-day-${day}" class="availability-label" th:text="${day}"></label>
+                    <select th:id="'start-time-' + ${day}" th:name="'startTime-' + ${day}"
+                            class="availability-start-time form-select form-control">
                         <option value="09:00">9:00 AM</option>
                         <option value="10:00">10:00 AM</option>
                         <option value="11:00">11:00 AM</option>
-                        <option value="12:00">12:00 AM</option>
-                        <option value="01:00">1:00 PM</option>
-                        <option value="02:00">2:00 PM</option>
-                        <option value="03:00">3:00 PM</option>
-                        <option value="04:00">4:00 PM</option>
-                        <option value="05:00">5:00 PM</option>
-                        <option value="06:00">6:00 PM</option>
-                        <option value="07:00">7:00 PM</option>
-                        <option value="08:00">8:00 PM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="13:00">1:00 PM</option>
+                        <option value="14:00">2:00 PM</option>
+                        <option value="15:00">3:00 PM</option>
+                        <option value="16:00">4:00 PM</option>
+                        <option value="17:00">5:00 PM</option>
+                        <option value="18:00">6:00 PM</option>
+                        <option value="19:00">7:00 PM</option>
+                        <option value="20:00">8:00 PM</option>
                     </select>
-
-                    <select th:id="'end-time-' + ${dayIndex}" th:field="*{availableHoursByDays[__${dayIndex.index}__].endTime}" class="availability-end-time form-select form-control">
-                        <option value="09:00">9:00 AM</option>
+                    <select th:id="'end-time-' + ${day}" th:name="'endTime-' + ${day}"
+                            class="availability-end-time form-select form-control">
                         <option value="10:00">10:00 AM</option>
                         <option value="11:00">11:00 AM</option>
-                        <option value="12:00">12:00 AM</option>
-                        <option value="01:00">1:00 PM</option>
-                        <option value="02:00">2:00 PM</option>
-                        <option value="03:00">3:00 PM</option>
-                        <option value="04:00">4:00 PM</option>
-                        <option value="05:00">5:00 PM</option>
-                        <option value="06:00">6:00 PM</option>
-                        <option value="07:00">7:00 PM</option>
-                        <option value="08:00">8:00 PM</option>
+                        <option value="12:00">12:00 PM</option>
+                        <option value="13:00">1:00 PM</option>
+                        <option value="14:00">2:00 PM</option>
+                        <option value="15:00">3:00 PM</option>
+                        <option value="16:00">4:00 PM</option>
+                        <option value="17:00">5:00 PM</option>
+                        <option value="18:00">6:00 PM</option>
+                        <option value="19:00">7:00 PM</option>
+                        <option value="20:00">8:00 PM</option>
                     </select>
                 </div>
             </div>
@@ -162,7 +175,5 @@
     </form>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-
 </body>
-
 </html>

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class EventController {
@@ -35,7 +36,8 @@ public class EventController {
     MeetService meetService;
 
     @Autowired
-    public EventController(EventService eventService, UserService userService, AvailabilityService availabilityService, MeetService meetService) {
+    public EventController(EventService eventService, UserService userService,
+                           AvailabilityService availabilityService, MeetService meetService) {
         this.eventService = eventService;
         this.userService = userService;
         this.availabilityService = availabilityService;
@@ -64,7 +66,7 @@ public class EventController {
     @GetMapping("event_types/solo")
     public String eventTypeSolo(Model model){
         Event event = new Event();
-        String[] days={"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+        String[] days={"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
         List<Availability> availabilities = new ArrayList<>();
         for (String day : days) {
             availabilities.add(new Availability(day, LocalTime.parse("00:00"), LocalTime.parse("00:00")));
@@ -73,7 +75,7 @@ public class EventController {
         event.setAvailableHoursByDays(availabilities);
         model.addAttribute("event", event);
         model.addAttribute("type", "solo");
-        model.addAttribute("daysOfWeek", Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"));
+        model.addAttribute("daysOfWeek", Arrays.asList("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"));
 
         return "solo-event";
     }
@@ -90,7 +92,7 @@ public class EventController {
         event.setAvailableHoursByDays(availabilities);
         model.addAttribute("event", event);
         model.addAttribute("type", "group");
-        model.addAttribute("daysOfWeek", Arrays.asList("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"));
+        model.addAttribute("daysOfWeek", Arrays.asList("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"));
 
         return "group-event";
     }
@@ -98,30 +100,46 @@ public class EventController {
     @GetMapping("/saveEvent")
     public String saveEvent(@AuthenticationPrincipal UserDetails userDetails,
                             @ModelAttribute("event") Event event,
-                            @RequestParam("type") String eventType, Model model)
-    {
+                            @RequestParam("type") String eventType,
+                            @RequestParam(value = "checkedDays", required = false) List<String> checkedDays,
+                            @RequestParam Map<String, String> requestParams, Model model) {
+
         String meetingId = UUID.randomUUID().toString();
         User host = userService.findUserByEmail(userDetails.getUsername());
         String eventLink = "https://calendly.com/"+host.getName()+"/"+event.getDuration()+"/"+meetingId;
         event.setEventLink(eventLink);
         event.setHost(host);
         event.setEventType(eventType);
-        for (Availability availability : event.getAvailableHoursByDays()) {
-            availability.setHost(host);
+
+        List<Availability> availabilities = new ArrayList<>();
+
+        if (checkedDays != null) {
+            for (String day : checkedDays) {
+                String startTime = requestParams.get("startTime-" + day);
+                String endTime = requestParams.get("endTime-" + day);
+                Availability availability = new Availability();
+                availability.setDay(day);
+                availability.setStartTime(LocalTime.parse(startTime));
+                availability.setEndTime(LocalTime.parse(endTime));
+                availability.setHost(host);
+                availabilities.add(availability);
+
+            }
         }
+
+        event.setAvailableHoursByDays(availabilities);
         eventService.save(event);
         Event theEvent = eventService.findByEventLink(eventLink);
         for (Availability availability : theEvent.getAvailableHoursByDays()) {
             availability.setEvent(theEvent);
             availabilityService.save(availability);
         }
-
-        String eventnewlink = "https://calendly-clone-73249cf67193.herokuapp.com/event/" + theEvent.getId() + "/select-date-time?eventId=" + meetingId;
-        event.setEventLink(eventnewlink);
+        String eventNewLink = "http://localhost:" + serverPort + "/event/" + theEvent.getId() + "/select-date-time?eventId=" + meetingId;
+        event.setEventLink(eventNewLink);
         eventService.save(event);
-        model.addAttribute("event",theEvent);
+        model.addAttribute("event", theEvent);
 
-        return "scheduled-events";
+        return "redirect:/scheduled_events";
     }
 
     @GetMapping("/scheduled_events")
@@ -155,24 +173,44 @@ public class EventController {
 
     @GetMapping("/event/update/{eventId}")
     public String showUpdateForm(@PathVariable("eventId") int eventId, Model model) {
+
         Event event = eventService.findEventById(eventId);
+        List<String> daysOfWeek = Arrays.asList("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun");
         model.addAttribute("event", event);
+        model.addAttribute("daysOfWeek", daysOfWeek);
         return "update-event";
     }
-
     @PostMapping("/event/update/{eventId}")
-    public String updateEvent(@PathVariable("eventId") int eventId, @ModelAttribute("event") Event updatedEvent, Model model) {
+    public String updateEvent(@PathVariable("eventId") int eventId, @ModelAttribute("event") Event updatedEvent,@RequestParam("checkedDays") List<String> checkedDays, @RequestParam Map<String, String> requestParams, Model model) {
         Event event = eventService.findEventById(eventId);
         event.setTitle(updatedEvent.getTitle());
         event.setDescription(updatedEvent.getDescription());
         event.setDuration(updatedEvent.getDuration());
         event.setPlatform(updatedEvent.getPlatform());
 
-        List<Availability> updatedAvailability = updatedEvent.getAvailableHoursByDays();
-        for (int i = 0; i < updatedAvailability.size(); i++) {
-            Availability availability = event.getAvailableHoursByDays().get(i);
-            availability.setStartTime(updatedAvailability.get(i).getStartTime());
-            availability.setEndTime(updatedAvailability.get(i).getEndTime());
+        Set<String> existingDays = event.getAvailableHoursByDays().stream()
+                .map(Availability::getDay)
+                .collect(Collectors.toSet());
+
+        for (String day : checkedDays) {
+            String startTime = requestParams.get("startTime-" + day);
+            String endTime = requestParams.get("endTime-" + day);
+            Availability availability = new Availability();
+            availability.setDay(day);
+            availability.setStartTime(LocalTime.parse(startTime));
+            availability.setEndTime(LocalTime.parse(endTime));
+            availability.setEvent(event);
+            if (existingDays.contains(day)) {
+                for (Availability existingAvailability : event.getAvailableHoursByDays()) {
+                    if (existingAvailability.getDay().equals(day)) {
+                        existingAvailability.setStartTime(LocalTime.parse(startTime));
+                        existingAvailability.setEndTime(LocalTime.parse(endTime));
+                        break;
+                    }
+                }
+            } else {
+                event.getAvailableHoursByDays().add(availability);
+            }
         }
         eventService.save(event);
 
